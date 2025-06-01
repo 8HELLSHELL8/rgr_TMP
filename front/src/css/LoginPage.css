@@ -1,0 +1,281 @@
+/* --- Core Variables (same as ProfilePage.css for consistency) --- */
+:root {
+  --primary-dark-bg: #0a0f0d; /* Very dark green/black */
+  --secondary-dark-bg: #1a1f1c; /* Slightly lighter dark */
+  --accent-color: #3d8f54; /* Muted military green */
+  --accent-hover-color: #52ac69; /* Lighter green for hover */
+  --text-primary-color: #c0c0c0; /* Light gray for text */
+  --text-secondary-color: #a0a0a0; /* Slightly darker gray */
+  --text-accent-color: #4CAF50; /* Brighter green for highlights */
+  --border-color: #2a3f30; /* Darker green for borders */
+  --error-color: #d32f2f; /* Muted red for errors */
+  --error-bg-color: rgba(211, 47, 47, 0.1); /* Background for error banner */
+  --font-main: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-headings: "Orbitron", "Agency FB", "Impact", sans-serif;
+}
+
+/* --- General Page Setup --- */
+.login-page-wrapper {
+  background-color: var(--primary-dark-bg);
+  color: var(--text-primary-color);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch; /* Make columns full height */
+  justify-content: center; /* Center content if art display is hidden/smaller */
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 480px; /* Max width for the form area */
+  background-color: var(--secondary-dark-bg);
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 2px solid var(--border-color); /* Separator if art display is next to it */
+  box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+}
+
+.login-art-display {
+  flex-grow: 1;
+  background-color: var(--primary-dark-bg); /* Or a background image */
+  /* Example: background: url('path-to-your-tech-art.jpg') no-repeat center center / cover; */
+  display: none; /* Hidden by default, shown on larger screens */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  position: relative; /* For overlay text */
+}
+
+.art-overlay-text {
+    font-family: var(--font-headings);
+    font-size: 1.5rem;
+    color: var(--border-color); /* Very subtle */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.8;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.art-overlay-text p {
+    margin: 5px 0;
+}
+
+
+/* --- Login Header --- */
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h1 {
+  font-family: var(--font-headings);
+  color: var(--accent-color);
+  font-size: 1.6rem; /* Slightly smaller than profile page main H1 */
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 5px rgba(61, 143, 84, 0.3);
+}
+
+.login-header p {
+  color: var(--text-secondary-color);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+/* --- Error Message Banner --- */
+.error-message-banner {
+  background-color: var(--error-bg-color);
+  border: 1px solid var(--error-color);
+  border-left-width: 4px;
+  color: var(--error-color);
+  padding: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 2px;
+  font-size: 0.9rem;
+}
+
+.error-message-banner .error-icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.error-message-banner .error-text {
+  flex-grow: 1;
+  line-height: 1.4;
+}
+
+.error-message-banner .close-error-button {
+  background: none;
+  border: none;
+  color: var(--error-color);
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 10px;
+  font-size: 1.2em;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.error-message-banner .close-error-button:hover {
+  opacity: 1;
+}
+
+
+/* --- Login Form --- */
+.login-form-main {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-family: var(--font-main); /* Or font-headings for a more blocky feel */
+  color: var(--text-secondary-color);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group .input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-color);
+  font-size: 1.2em;
+  opacity: 0.6;
+  pointer-events: none; /* So it doesn't interfere with input click */
+}
+
+.form-input {
+  width: 100%;
+  background-color: rgba(0,0,0, 0.25); /* Darker input field */
+  border: 1px solid var(--border-color);
+  color: var(--text-primary-color);
+  padding: 12px 15px 12px 45px; /* Left padding for icon */
+  font-size: 1rem;
+  border-radius: 2px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: var(--font-main);
+}
+
+.form-input::placeholder {
+  color: var(--text-secondary-color);
+  opacity: 0.7;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 8px rgba(61, 143, 84, 0.3);
+}
+
+/* --- Submit Button --- */
+.submit-login-button {
+  background-color: var(--accent-color);
+  color: var(--primary-dark-bg); /* Dark text on lighter button */
+  border: 1px solid var(--accent-hover-color);
+  padding: 12px 25px;
+  font-family: var(--font-headings);
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  display: flex; /* Use flex for icon and text alignment */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px; /* Space above button */
+}
+
+.submit-login-button:hover:not(:disabled),
+.submit-login-button:focus:not(:disabled) {
+  background-color: var(--accent-hover-color);
+  color: #fff; /* White text on hover */
+  box-shadow: 0 0 10px rgba(93, 191, 119, 0.5);
+  outline: none;
+}
+
+.submit-login-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.submit-login-button:disabled {
+  background-color: var(--border-color);
+  color: var(--text-secondary-color);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.submit-login-button .button-icon {
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+/* --- Spinner Animation (reused from ProfilePage) --- */
+.icon-spin {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Visually Hidden Class (if not globally available) --- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* --- Responsive Adjustments --- */
+@media (min-width: 769px) { /* Show art display on tablets and wider */
+    .login-art-display {
+        display: flex; /* Or 'block' if you prefer */
+    }
+}
+
+@media (max-width: 768px) {
+  .login-form-container {
+    border-right: none; /* No border when it's full width */
+    padding: 30px 20px; /* Slightly less padding on smaller screens */
+    min-height: 100vh; /* Ensure it takes full height */
+    box-shadow: none;
+  }
+  .login-art-display {
+    display: none; /* Hide art on smaller screens to focus on form */
+  }
+  .login-header h1 {
+    font-size: 1.4rem;
+  }
+}

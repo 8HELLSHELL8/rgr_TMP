@@ -1,0 +1,422 @@
+/* --- WeaponsPage.css --- */
+
+/* --- Core Variables (matching ProfilePage/SaveLog.css for consistency) --- */
+:root {
+  --primary-dark-bg: #0a0f0d;
+  --secondary-dark-bg: #1a1f1c;
+  --accent-color: #3d8f54; /* Muted military green */
+  --accent-hover-color: #52ac69;
+  --text-primary-color: #c0c0c0;
+  --text-secondary-color: #a0a0a0;
+  --text-accent-color: #4CAF50; /* Brighter green for highlights */
+  --border-color: #2a3f30;
+  --error-color: #d32f2f;
+  --font-main: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-headings: "Orbitron", "Agency FB", "Impact", sans-serif;
+  --input-bg-color: #101512;
+  --input-border-color: var(--border-color);
+  --input-focus-border-color: var(--accent-color);
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 0 3px rgba(61, 143, 84, 0.1);
+}
+
+/* --- General Page Setup (from SaveLog.css, ensure these are loaded) --- */
+body {
+  background-color: var(--primary-dark-bg);
+  color: var(--text-primary-color);
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 0;
+}
+
+.weapons-page { /* Can inherit from a global .app-page or similar if defined */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* Changed to column for header/main stacking */
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1400px; /* Wider for potentially more card content */
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Spacing between header, main sections */
+}
+
+/* --- Page Header (from SaveLog.css) --- */
+.page-header {
+  background-color: var(--secondary-dark-bg);
+  padding: 15px 25px;
+  border: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--accent-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px 4px 0 0;
+  flex-wrap: wrap; /* Allow items to wrap if space is limited */
+  gap: 15px;
+}
+
+.page-header h1 {
+  font-family: var(--font-headings);
+  color: var(--accent-color);
+  font-size: 1.8rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 5px rgba(61, 143, 84, 0.5);
+}
+
+/* --- Main Content Area (from SaveLog.css) --- */
+.export-main {
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* Spacing between sections like filters and list */
+}
+
+/* Card style for sections (from SaveLog.css) */
+.card-style {
+  background-color: var(--secondary-dark-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 20px 25px;
+  box-shadow: var(--card-shadow);
+}
+
+.section-title {
+  font-family: var(--font-headings);
+  color: var(--text-accent-color);
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.title-icon {
+  font-size: 1em; /* Relative to h2 font size */
+  color: var(--accent-color);
+}
+
+
+/* --- Status/Loading/Error (from SaveLog.css, with additions) --- */
+.status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-primary-color);
+  font-family: var(--font-headings);
+  width: 100%;
+}
+.status-container.no-data-card { /* Specific for "no data" message if it's in a card */
+    background-color: var(--secondary-dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    box-shadow: var(--card-shadow);
+}
+.status-container p {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.icon-spin {
+  animation: spin 2s linear infinite;
+  color: var(--accent-color);
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.status-container.error-display {
+    background-color: rgba(var(--error-color), 0.1); /* Subtle error background */
+    border: 1px solid var(--error-color);
+    padding: 30px;
+    border-radius: 4px;
+}
+.status-container .error-message, .inline-error {
+  color: var(--error-color);
+  font-size: 1.1rem;
+  font-family: var(--font-main);
+  text-transform: none;
+  letter-spacing: normal;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inline-error {
+    padding: 10px;
+    background-color: rgba(var(--error-color), 0.05);
+    border: 1px dashed var(--error-color);
+    border-radius: 3px;
+    margin-bottom: 15px; /* If it appears above other content */
+}
+.status-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-grid { /* (from SaveLog.css) */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.filter-group { /* (from SaveLog.css) */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.filter-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary-color);
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space for icon */
+}
+.label-icon {
+  color: var(--accent-color);
+  font-size: 1.1em;
+}
+.filter-group select { /* (from SaveLog.css) */
+  background-color: var(--input-bg-color);
+  color: var(--text-primary-color);
+  border: 1px solid var(--input-border-color);
+  padding: 10px 12px;
+  border-radius: 2px;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--input-focus-border-color);
+  box-shadow: 0 0 5px rgba(61, 143, 84, 0.3);
+}
+.controls-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end; /* Align button to the right */
+  gap: 15px;
+}
+
+
+/* --- Buttons (General from SaveLog.css, with specifics) --- */
+.styled-button {
+  background-color: var(--accent-color);
+  color: var(--primary-dark-bg); /* Dark text on accent bg */
+  border: 1px solid var(--accent-hover-color);
+  padding: 10px 18px;
+  font-family: var(--font-headings);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  gap: 8px;
+}
+.styled-button:hover,
+.styled-button:focus {
+  background-color: var(--accent-hover-color);
+  color: #fff; /* Lighter text on hover */
+  box-shadow: 0 0 10px rgba(93, 191, 119, 0.5);
+  outline: none;
+}
+.styled-button:active {
+  transform: translateY(1px);
+}
+.styled-button .button-icon {
+  font-size: 1.1em; /* Slightly larger icon in button */
+}
+.styled-button.button-secondary {
+  background-color: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+.styled-button.button-secondary:hover,
+.styled-button.button-secondary:focus {
+  background-color: rgba(61, 143, 84, 0.1);
+  color: var(--accent-hover-color);
+  border-color: var(--accent-hover-color);
+}
+.styled-button.button-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+.back-button { /* (from SaveLog.css, if specific styling needed) */
+  padding: 8px 15px;
+  font-size: 0.85rem;
+}
+
+/* --- Weapon List & Items --- */
+.weapon-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive grid for cards */
+  gap: 20px;
+}
+
+.weapon-card-item { /* Uses .card-style as a base, applied to <li> or <div> */
+  display: flex; /* To make the link fill the card */
+  flex-direction: column;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.weapon-card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4), 0 0 10px var(--accent-color);
+}
+
+.weapon-link-wrapper {
+  text-decoration: none;
+  color: inherit; /* Inherit color from parent card */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Ensure link content fills card */
+  height: 100%; /* Ensure link fills height */
+}
+
+.weapon-card-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+.weapon-card-header h3 {
+  font-family: var(--font-headings);
+  color: var(--text-accent-color);
+  font-size: 1.2rem;
+  margin: 0;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.weapon-card-header .title-icon {
+  font-size: 1.1em;
+}
+
+.weapon-card-body {
+  flex-grow: 1; /* Allows body to take up space, pushing footer down */
+}
+.weapon-card-body p {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: var(--text-primary-color);
+  display: flex;
+  align-items: flex-start; /* Align icon with first line of text */
+  gap: 8px;
+}
+.weapon-card-body p strong {
+  color: var(--text-secondary-color);
+  min-width: 90px; /* Align values */
+  display: inline-block;
+}
+.detail-icon {
+  color: var(--accent-color);
+  margin-top: 0.15em; /* Fine-tune vertical alignment */
+  font-size: 1em;
+  flex-shrink: 0; /* Prevent icon from shrinking */
+}
+.weapon-card-body .description {
+  font-size: 0.85rem;
+  color: var(--text-secondary-color);
+  line-height: 1.5;
+  max-height: 70px; /* Example: limit description height */
+  overflow-y: auto; /* Add scroll if description is too long */
+  padding-right: 5px; /* Space for scrollbar */
+}
+/* Custom scrollbar for description (optional) */
+.weapon-card-body .description::-webkit-scrollbar {
+  width: 6px;
+}
+.weapon-card-body .description::-webkit-scrollbar-track {
+  background: var(--input-bg-color);
+  border-radius: 3px;
+}
+.weapon-card-body .description::-webkit-scrollbar-thumb {
+  background-color: var(--accent-color);
+  border-radius: 3px;
+}
+
+
+.weapon-card-footer {
+  margin-top: auto; /* Pushes footer to the bottom if card body doesn't fill space */
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+  text-align: right; /* Align button to the right */
+}
+
+.no-data-message { /* (from SaveLog.css, ensure it's suitable) */
+  color: var(--text-secondary-color);
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  font-size: 1.1rem !important; /* Override status-container p if needed */
+  font-family: var(--font-main);
+}
+
+/* Responsive adjustments (example from SaveLog.css) */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-size: 1.4rem;
+  }
+  .filter-grid {
+    grid-template-columns: 1fr; /* Stack filters on smaller screens */
+  }
+  .controls-actions {
+    justify-content: center; /* Center button on small screens */
+  }
+  .weapon-list {
+    grid-template-columns: 1fr; /* Stack weapon cards */
+  }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+    .styled-button {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
+    .styled-button.button-sm {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+    .section-title {
+        font-size: 1.1rem;
+    }
+    .weapon-card-header h3 {
+        font-size: 1rem;
+    }
+}

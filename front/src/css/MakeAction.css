@@ -1,0 +1,281 @@
+/* --- MakeAction.css --- */
+
+/* --- Core Variables (matching other pages) --- */
+:root {
+  --primary-dark-bg: #0a0f0d;
+  --secondary-dark-bg: #1a1f1c;
+  --accent-color: #3d8f54;
+  --accent-hover-color: #52ac69;
+  --text-primary-color: #c0c0c0;
+  --text-secondary-color: #a0a0a0;
+  --text-accent-color: #4CAF50;
+  --border-color: #2a3f30;
+  --error-color: #d32f2f; /* Muted red for errors */
+  --error-bg-color: rgba(211, 47, 47, 0.1);
+  --success-color: #3d8f54; /* Using accent for success text */
+  --success-bg-color: rgba(61, 143, 84, 0.1);
+  --font-main: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-headings: "Orbitron", "Agency FB", "Impact", sans-serif;
+  --input-bg-color: #101512;
+  --input-border-color: var(--border-color);
+  --input-focus-border-color: var(--accent-color);
+}
+
+/* --- General Page Setup --- */
+.make-action-page {
+  background-color: var(--primary-dark-bg);
+  color: var(--text-primary-color);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 900px; /* Adjusted for form layout */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Page Header --- */
+.page-header {
+  background-color: var(--secondary-dark-bg);
+  padding: 15px 25px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--accent-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px 4px 0 0;
+}
+
+.page-header h1 {
+  font-family: var(--font-headings);
+  color: var(--accent-color);
+  font-size: 1.5rem; /* Adjusted */
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* --- Main Content Area (Form Card) --- */
+.make-action-main.card-style {
+  background-color: var(--secondary-dark-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 4px 4px; /* Complement header */
+  padding: 25px 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 0 3px rgba(61, 143, 84, 0.1);
+}
+
+/* --- Form Specifics --- */
+.action-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* Space between form grid and submit button */
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns by default */
+  gap: 20px; /* Gap between grid items */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Space between label and input */
+}
+
+.form-group.form-group-full-width {
+  grid-column: 1 / -1; /* Make textarea span full width */
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: var(--text-secondary-color);
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.form-group select,
+.form-group textarea {
+  background-color: var(--input-bg-color);
+  color: var(--text-primary-color);
+  border: 1px solid var(--input-border-color);
+  padding: 12px 10px;
+  border-radius: 2px;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--input-focus-border-color);
+  box-shadow: 0 0 5px rgba(61, 143, 84, 0.3);
+}
+.form-group textarea {
+    resize: vertical; /* Allow vertical resize */
+    min-height: 80px;
+}
+
+/* --- Buttons (General from SaveLog, plus specific) --- */
+.styled-button {
+  background-color: var(--accent-color);
+  color: var(--primary-dark-bg); /* Dark text on lighter button */
+  border: 1px solid var(--accent-hover-color);
+  padding: 12px 20px;
+  font-family: var(--font-headings);
+  text-transform: uppercase;
+  font-size: 0.95rem; /* Slightly larger */
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  gap: 10px; /* For icon and text */
+}
+.styled-button:hover,
+.styled-button:focus {
+  background-color: var(--accent-hover-color);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(93, 191, 119, 0.5);
+}
+.styled-button:active { transform: translateY(1px); }
+.styled-button:disabled {
+    background-color: var(--border-color);
+    color: var(--text-secondary-color);
+    cursor: not-allowed;
+    border-color: var(--border-color);
+}
+.styled-button:disabled .icon-spin {
+    color: var(--text-secondary-color) !important;
+}
+
+
+.styled-button.button-secondary {
+  background-color: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+.styled-button.button-secondary:hover,
+.styled-button.button-secondary:focus {
+  background-color: rgba(61, 143, 84, 0.1);
+  color: var(--accent-hover-color);
+  border-color: var(--accent-hover-color);
+}
+
+.back-button { /* Specific to header button */
+  padding: 8px 15px;
+  font-size: 0.85rem;
+}
+
+.submit-action-button {
+  width: 100%; /* Full width submit button */
+  margin-top: 10px; /* Space above it */
+  padding: 15px; /* Make it prominent */
+  font-size: 1.1rem;
+}
+
+
+/* --- Status/Error/Success Messages --- */
+.status-container { /* For full-page loaders/errors/success messages */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh; /* Adjusted as it's within .page-container */
+  text-align: center;
+  color: var(--text-primary-color);
+  font-family: var(--font-headings);
+  padding: 20px;
+  width: 100%;
+}
+.status-container p {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.status-container .icon-spin { color: var(--accent-color); }
+
+/* Full page error for critical load failures */
+.status-container.error-display {
+  background-color: var(--secondary-dark-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 30px;
+  max-width: 700px;
+  margin: auto; /* Center in viewport if .make-action-page is not already doing so */
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+.status-container.error-display .error-message {
+  color: var(--error-color);
+  font-size: 1.2rem;
+  font-family: var(--font-main);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.status-container.error-display .styled-button { margin-top: 20px;}
+
+
+/* Form-specific error message */
+.form-error-message {
+  background-color: var(--error-bg-color);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+  border-left-width: 4px;
+  padding: 12px 15px;
+  margin-top: 10px; /* Space from form grid */
+  margin-bottom: 10px; /* Space before submit button */
+  border-radius: 2px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Success message styling */
+.status-container.success-display {
+    font-family: var(--font-headings);
+    color: var(--success-color); /* Use accent for text */
+}
+.status-container.success-display svg { /* Icon color */
+    color: var(--success-color);
+    margin-bottom: 10px;
+}
+.status-container.success-display .redirect-info {
+    font-size: 1rem;
+    color: var(--text-secondary-color);
+    font-family: var(--font-main);
+    text-transform: none;
+}
+
+.icon-spin {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  .page-header h1 { font-size: 1.3rem; }
+  .form-grid { grid-template-columns: 1fr; } /* Stack form groups */
+}

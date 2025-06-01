@@ -1,0 +1,278 @@
+/* --- WeaponDetailsPage.css --- */
+
+/* --- Core Variables (ensure these are globally available or defined here) --- */
+:root {
+  --primary-dark-bg: #0a0f0d;
+  --secondary-dark-bg: #1a1f1c;
+  --accent-color: #3d8f54; /* Muted military green */
+  --accent-hover-color: #52ac69;
+  --text-primary-color: #c0c0c0;
+  --text-secondary-color: #a0a0a0;
+  --text-accent-color: #4CAF50; /* Brighter green for highlights */
+  --border-color: #2a3f30;
+  --error-color: #d32f2f;
+  --font-main: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-headings: "Orbitron", "Agency FB", "Impact", sans-serif;
+  --input-bg-color: #101512;
+  --input-border-color: var(--border-color);
+  --input-focus-border-color: var(--accent-color);
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 0 3px rgba(61, 143, 84, 0.1);
+}
+
+/* --- General Page Setup (re-iterate for clarity, ideally from global styles) --- */
+body {
+  background-color: var(--primary-dark-bg);
+  color: var(--text-primary-color);
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 0;
+}
+
+.weapon-details-page { /* Can inherit from a global .app-page or similar */
+  min-height: 100vh;
+  display: flex; /* Ensure it can center .page-container if needed */
+  flex-direction: column;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1000px; /* Adjusted for a details page, might not need to be as wide */
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page-header {
+  background-color: var(--secondary-dark-bg);
+  padding: 15px 25px;
+  border: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--accent-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px 4px 0 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.page-header h1 {
+  font-family: var(--font-headings);
+  color: var(--accent-color);
+  font-size: 1.6rem; /* Slightly smaller for details page if name is long */
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 5px rgba(61, 143, 84, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon {
+  font-size: 1.2em; /* Relative to h1 font size */
+}
+
+.export-main {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.card-style {
+  background-color: var(--secondary-dark-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 20px 25px;
+  box-shadow: var(--card-shadow);
+}
+
+.section-title {
+  font-family: var(--font-headings);
+  color: var(--text-accent-color);
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.title-icon {
+  font-size: 1em;
+  color: var(--accent-color);
+}
+
+/* --- Status/Loading/Error (consistent with other pages) --- */
+.status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-primary-color);
+  font-family: var(--font-headings);
+  width: 100%;
+  min-height: 300px; /* Ensure it takes some space */
+}
+.status-container p {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.icon-spin {
+  animation: spin 2s linear infinite;
+  color: var(--accent-color);
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.status-container.error-display {
+    background-color: var(--secondary-dark-bg); /* Using card bg for error container */
+    border: 1px solid var(--error-color);
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(var(--error-color), 0.3);
+}
+.status-container .error-message {
+  color: var(--error-color);
+  font-size: 1.1rem;
+  font-family: var(--font-main);
+  text-transform: none;
+  letter-spacing: normal;
+  max-width: 600px;
+}
+.status-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* --- Styled Button (consistent with other pages) --- */
+.styled-button {
+  background-color: var(--accent-color);
+  color: var(--primary-dark-bg);
+  border: 1px solid var(--accent-hover-color);
+  padding: 10px 18px;
+  font-family: var(--font-headings);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  gap: 8px;
+}
+.styled-button:hover,
+.styled-button:focus {
+  background-color: var(--accent-hover-color);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(93, 191, 119, 0.5);
+  outline: none;
+}
+.styled-button:active {
+  transform: translateY(1px);
+}
+.styled-button .button-icon {
+  font-size: 1.1em;
+}
+.styled-button.button-secondary {
+  background-color: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+.styled-button.button-secondary:hover,
+.styled-button.button-secondary:focus {
+  background-color: rgba(61, 143, 84, 0.1);
+  color: var(--accent-hover-color);
+  border-color: var(--accent-hover-color);
+}
+.back-button {
+  padding: 8px 15px;
+  font-size: 0.85rem;
+}
+
+.details-list {
+  margin: 0;
+  padding: 0;
+}
+
+.detail-item {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 10px; /* Gap between dt and dd if they wrap */
+}
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-item dt {
+  font-family: var(--font-main); /* Changed from headings for dt */
+  font-weight: bold;
+  color: var(--text-secondary-color);
+  flex-basis: 200px; /* Fixed width for labels */
+  flex-shrink: 0; /* Prevent label from shrinking */
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center; /* Vertically center icon and text */
+  gap: 8px;
+}
+.detail-icon {
+  color: var(--accent-color);
+  font-size: 1.2em; /* Slightly larger for detail items */
+  flex-shrink: 0;
+}
+
+.detail-item dd {
+  flex-grow: 1;
+  margin-left: 0; /* Reset dl default margin */
+  color: var(--text-primary-color);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.description-text {
+  background-color: var(--input-bg-color); /* Slight background for readability */
+  padding: 10px;
+  border-radius: 2px;
+  border: 1px solid var(--border-color);
+  white-space: pre-wrap; /* Preserve line breaks from description */
+  font-size: 0.95rem !important; /* Override generic dd if needed */
+}
+
+/* Responsive adjustments for details list */
+@media (max-width: 600px) {
+  .page-header h1 {
+    font-size: 1.3rem;
+  }
+  .detail-item {
+    flex-direction: column; /* Stack label and value */
+    align-items: flex-start; /* Align items to the start */
+    gap: 5px;
+  }
+  .detail-item dt {
+    flex-basis: auto; /* Allow label to take natural width */
+    margin-bottom: 3px; /* Space between label and value */
+  }
+  .section-title {
+    font-size: 1.1rem;
+  }
+}

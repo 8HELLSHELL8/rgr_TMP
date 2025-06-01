@@ -1,0 +1,238 @@
+/* --- ProfilePage.css --- */
+
+/* --- Core Variables --- */
+:root {
+  --primary-dark-bg: #0a0f0d; /* Very dark green/black */
+  --secondary-dark-bg: #1a1f1c; /* Slightly lighter dark */
+  --accent-color: #3d8f54; /* Muted military green */
+  --accent-hover-color: #52ac69; /* Lighter green for hover */
+  --text-primary-color: #c0c0c0; /* Light gray for text */
+  --text-secondary-color: #a0a0a0; /* Slightly darker gray */
+  --text-accent-color: #4CAF50; /* Brighter green for highlights */
+  --border-color: #2a3f30; /* Darker green for borders */
+  --error-color: #d32f2f; /* Muted red for errors */
+  --font-main: "Roboto Condensed", "Arial Narrow", sans-serif; /* Condensed, utilitarian font */
+  --font-headings: "Orbitron", "Agency FB", "Impact", sans-serif; /* More blocky/techy for headings */
+}
+
+/* --- General Page Setup --- */
+.profile-page {
+  background-color: var(--primary-dark-bg);
+  color: var(--text-primary-color);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  /* Optional: subtle background pattern */
+  /* background-image: url('path-to-subtle-grid-or-noise-pattern.png'); */
+}
+
+.profile-container {
+  width: 100%;
+  max-width: 800px; /* Max width for content */
+  background-color: var(--secondary-dark-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 4px; /* Sharp edges */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(61, 143, 84, 0.2);
+  overflow: hidden; /* Ensures child elements conform to border-radius */
+}
+
+/* --- Header --- */
+.profile-header {
+  background-color: var(--border-color); /* Darker band */
+  padding: 15px 25px;
+  text-align: center;
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.profile-header h1 {
+  font-family: var(--font-headings);
+  color: var(--accent-color);
+  font-size: 1.8rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px rgba(61, 143, 84, 0.5);
+}
+
+/* --- Main Content --- */
+.profile-main {
+  padding: 25px;
+}
+
+/* --- Profile Card --- */
+.profile-card {
+  background-color: rgba(0,0,0, 0.2); /* Slightly transparent inner card */
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.profile-card-header h2 {
+  font-family: var(--font-headings);
+  color: var(--text-secondary-color);
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+/* --- Profile Details (dl, dt, dd) --- */
+.profile-details {
+  margin: 0;
+  padding: 0;
+}
+
+.profile-detail-item {
+  display: flex;
+  align-items: center; /* Align icon with text */
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--accent-color);
+  transition: background-color 0.3s ease;
+}
+
+.profile-detail-item:hover {
+    background-color: rgba(61, 143, 84, 0.1);
+}
+
+.profile-detail-item dt {
+  font-weight: bold;
+  color: var(--text-accent-color);
+  min-width: 200px; /* Adjust as needed for alignment */
+  margin-right: 15px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.detail-icon {
+  margin-right: 10px;
+  color: var(--accent-color);
+  font-size: 1.2em; /* Relative to dt font size */
+}
+
+.profile-detail-item dd {
+  margin-left: 0;
+  color: var(--text-primary-color);
+  font-size: 1rem;
+  word-break: break-word; /* For long emails or names */
+}
+
+/* --- Buttons --- */
+.styled-button {
+  background-color: var(--accent-color);
+  color: var(--primary-dark-bg); /* Dark text on lighter button */
+  border: 1px solid var(--accent-hover-color);
+  padding: 10px 20px;
+  font-family: var(--font-headings);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none; /* For Link components if used as button */
+}
+
+.styled-button:hover,
+.styled-button:focus {
+  background-color: var(--accent-hover-color);
+  color: #fff; /* White text on hover for better contrast */
+  box-shadow: 0 0 10px rgba(93, 191, 119, 0.5);
+  outline: none;
+}
+
+.styled-button:active {
+  transform: translateY(1px);
+}
+
+.button-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+}
+
+.back-button {
+  display: block; /* Make it full width or adjust as needed */
+  width: fit-content;
+  margin: 20px auto 0 auto; /* Center button */
+}
+
+
+/* --- Loading/Error States --- */
+.profile-status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+  color: var(--text-primary-color);
+  font-family: var(--font-headings);
+  padding: 20px;
+}
+
+.profile-status-container p {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.profile-status-container .error-message {
+  color: var(--error-color);
+  font-size: 1.2rem; /* Slightly smaller for error details */
+}
+
+.profile-status-container .styled-button {
+    margin-top: 20px;
+}
+
+.icon-spin {
+  animation: spin 2s linear infinite;
+  color: var(--accent-color);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Responsive Adjustments (Optional Example) --- */
+@media (max-width: 600px) {
+  .profile-header h1 {
+    font-size: 1.5rem;
+  }
+  .profile-detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    border-left-width: 5px; /* Make it more prominent on mobile */
+  }
+  .profile-detail-item dt {
+    min-width: auto;
+    margin-bottom: 5px;
+  }
+  .profile-main {
+    padding: 15px;
+  }
+  .profile-card {
+    padding: 15px;
+  }
+}

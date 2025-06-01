@@ -1,0 +1,359 @@
+/* --- Core Variables (consistent with other pages) --- */
+:root {
+  --primary-dark-bg: #0a0f0d;
+  --secondary-dark-bg: #1a1f1c;
+  --accent-color: #3d8f54;
+  --accent-hover-color: #52ac69;
+  --text-primary-color: #c0c0c0;
+  --text-secondary-color: #a0a0a0;
+  --text-accent-color: #4CAF50;
+  --border-color: #2a3f30;
+  --error-color: #d32f2f;
+  --error-bg-color: rgba(211, 47, 47, 0.1);
+  --warning-color: #ffa000;
+  --warning-bg-color: rgba(255, 160, 0, 0.1);
+  --success-color: #388e3c;
+  --success-bg-color: rgba(56, 142, 60, 0.1);
+  --info-color: #1976d2;
+  --info-bg-color: rgba(25, 118, 210, 0.1);
+  --font-main: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-headings: "Orbitron", "Agency FB", "Impact", sans-serif;
+}
+
+/* --- General Page Setup --- */
+.special-details-page {
+  background-color: var(--primary-dark-bg);
+  color: var(--text-primary-color);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Status/Loading Containers --- */
+.status-container-special {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding: 40px 20px;
+  text-align: center;
+  font-family: var(--font-headings);
+}
+
+.status-container-special p {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary-color);
+}
+
+.status-container-special .icon-spin {
+  color: var(--accent-color);
+}
+
+.error-container-special .error-text {
+  color: var(--error-color);
+  font-size: 1.3rem;
+  line-height: 1.6;
+}
+
+.error-container-special .styled-button,
+.status-container-special .styled-button {
+  margin-top: 25px;
+}
+
+/* --- Styled Button (reusable) --- */
+.styled-button {
+  background-color: var(--accent-color);
+  color: var(--primary-dark-bg);
+  border: 1px solid var(--accent-hover-color);
+  padding: 10px 20px;
+  font-family: var(--font-headings);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.styled-button:hover,
+.styled-button:focus {
+  background-color: var(--accent-hover-color);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(93, 191, 119, 0.5);
+  outline: none;
+}
+
+.styled-button:active {
+  transform: translateY(1px);
+}
+
+.styled-button .button-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+}
+
+/* --- Header --- */
+.special-details-header {
+  background-color: var(--secondary-dark-bg);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.special-details-header h1 {
+  font-family: var(--font-headings);
+  color: var(--accent-color);
+  font-size: 1.7rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 5px rgba(61, 143, 84, 0.4);
+  display: flex;
+  align-items: center;
+}
+.special-details-header .header-icon {
+  margin-right: 15px;
+  font-size: 1.5em; /* Make header icon slightly larger */
+  opacity: 0.7;
+}
+
+
+.back-button-header-special {
+  font-size: 0.85rem;
+  padding: 8px 15px;
+}
+
+/* --- Main Content --- */
+.special-details-content {
+  padding: 30px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.special-card {
+  background-color: rgba(0,0,0, 0.25);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 25px 30px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3), inset 0 0 3px rgba(61, 143, 84, 0.1);
+}
+
+.special-card-header h2 {
+  font-family: var(--font-headings);
+  color: var(--text-secondary-color);
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+/* --- Special Attributes (dl, dt, dd) --- */
+.special-attributes {
+  margin: 0;
+  padding: 0;
+}
+
+.special-attribute {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--accent-color);
+  transition: background-color 0.3s ease;
+  border-radius: 0 2px 2px 0;
+}
+.special-attribute:last-child {
+    margin-bottom: 0;
+}
+.special-attribute:hover {
+    background-color: rgba(61, 143, 84, 0.08);
+}
+
+.special-attribute.special-attribute-full {
+    flex-direction: column;
+}
+.special-attribute.special-attribute-full dt {
+    margin-bottom: 8px;
+    min-width: auto;
+}
+
+.special-attribute dt {
+  font-weight: bold;
+  color: var(--text-accent-color);
+  min-width: 250px; /* Adjusted for longer titles */
+  margin-right: 15px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+}
+
+.special-attribute .detail-icon {
+  margin-right: 10px;
+  color: var(--accent-color);
+  font-size: 1.3em;
+  opacity: 0.8;
+}
+
+.special-attribute dd {
+  margin-left: 0;
+  color: var(--text-primary-color);
+  font-size: 1rem;
+  word-break: break-word;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.special-attribute dd.description-dd {
+  background-color: rgba(0,0,0,0.2);
+  padding: 10px;
+  border-radius: 2px;
+  font-family: 'Consolas', 'Courier New', Courier, monospace; /* Techy monospace font */
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: var(--text-primary-color); /* Ensure good contrast */
+}
+
+/* --- Status Badge --- */
+.status-badge-special {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+.status-badge-special.status-default {
+  background-color: var(--secondary-dark-bg);
+  border-color: var(--border-color);
+  color: var(--text-secondary-color);
+}
+.status-badge-special.status-success {
+  background-color: var(--success-bg-color);
+  border-color: var(--success-color);
+  color: var(--success-color);
+}
+.status-badge-special.status-error {
+  background-color: var(--error-bg-color);
+  border-color: var(--error-color);
+  color: var(--error-color);
+}
+.status-badge-special.status-warning {
+  background-color: var(--warning-bg-color);
+  border-color: var(--warning-color);
+  color: var(--warning-color);
+}
+.status-badge-special.status-info {
+  background-color: var(--info-bg-color);
+  border-color: var(--info-color);
+  color: var(--info-color);
+}
+.status-badge-special.status-unknown {
+  background-color: var(--secondary-dark-bg);
+  border-color: var(--text-secondary-color);
+  color: var(--text-secondary-color);
+  opacity: 0.7;
+}
+
+/* --- Footer --- */
+.special-details-footer {
+  background-color: var(--secondary-dark-bg);
+  padding: 15px 30px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  color: var(--text-secondary-color);
+  margin-top: auto;
+}
+.special-details-footer p {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- Spinner Animation --- */
+.icon-spin {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .special-details-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px 20px;
+  }
+  .special-details-header h1 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+  .special-details-header .header-icon {
+    font-size: 1.3em;
+    margin-right: 10px;
+  }
+  .back-button-header-special {
+    align-self: flex-start;
+  }
+  .special-details-content {
+    padding: 20px;
+  }
+  .special-card {
+    padding: 20px;
+  }
+  .special-card-header h2 {
+    font-size: 1.2rem;
+  }
+  .special-attribute {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .special-attribute dt {
+    min-width: auto;
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+    .special-details-header h1 {
+        font-size: 1.2rem;
+    }
+     .styled-button {
+        font-size: 0.8rem;
+        padding: 8px 15px;
+    }
+    .status-badge-special {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+    }
+}
