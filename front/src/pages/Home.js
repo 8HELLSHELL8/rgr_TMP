@@ -24,19 +24,18 @@ import {
 import "../css/Home.css";
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
+  baseURL: process.env.REACT_APP_API_URL || "http://217.71.129.139:5785",
   withCredentials: true,
 });
 
 apiClient.interceptors.request.use(
   (config) => {
     const getCookie = (name) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
     };
-
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(config.method.toUpperCase())) {
       const csrfToken = getCookie('csrf-token');
       if (csrfToken) {
@@ -50,8 +49,7 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
-const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
+const Home = ({ finalizeLogoutProcess, apiClient }) => {
   const [logs, setLogs] = useState([]);
   const [error, setError] = useState(null);
   const [loadingLogs, setLoadingLogs] = useState(true);
@@ -61,23 +59,19 @@ const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
   const [filterStatus, setFilterStatus] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
-  const [userDisplayName, setUserDisplayName] = useState("Оператор");
-
+  const [userDisplayName, setUserDisplayName] = useState("Operator");
   const navigate = useNavigate();
 
-  // Use the apiClient passed as a prop.
-  // If no apiClient prop is guaranteed, you might want a fallback or to ensure it's always passed.
-  const currentApiClient = apiClient; // Assuming apiClient prop is always provided by App.js
+  const currentApiClient = apiClient;
 
   useEffect(() => {
     const userString = localStorage.getItem("user");
     if (userString) {
       try {
         const userData = JSON.parse(userString);
-        setUserDisplayName(userData.username || `${userData.name} ${userData.surname}`.trim() || "Оператор");
+        setUserDisplayName(userData.username || `${userData.name} ${userData.surname}`.trim() || "Operator");
       } catch (e) {
-        console.error("Ошибка парсинга данных пользователя из localStorage:", e);
-        // setUserDisplayName("Оператор"); // Fallback already set
+        console.error("Error parsing user data from localStorage:", e);
       }
     }
   }, []);
@@ -92,17 +86,16 @@ const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
 
   const fetchLogs = useCallback(async () => {
     if (!currentApiClient) {
-        setError("Ошибка конфигурации: API клиент не доступен.");
-        setLoadingLogs(false);
-        setLogs([]);
-        return;
+      setError("Configuration error: API client not available.");
+      setLoadingLogs(false);
+      setLogs([]);
+      return;
     }
     setLoadingLogs(true);
     setError(null);
     try {
       const response = await currentApiClient.get("/api/logs/summary");
       let fetchedLogs = response.data?.logs || [];
-
       fetchedLogs.sort((a, b) => {
         switch (sortCriteria) {
           case "time-asc": return new Date(a.time) - new Date(b.time);
@@ -114,23 +107,22 @@ const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
       });
       setLogs(fetchedLogs);
     } catch (err) {
-      console.error("Ошибка при загрузке логов:", err);
+      console.error("Error loading logs:", err);
       if (err.response && err.response.status === 401) {
-        showMessage("Сессия истекла или нет авторизации. Перенаправление на вход...", "error", 3000);
-        // If session expires, App.js's finalizeLogoutProcess should handle full logout and redirect
+        showMessage("Session expired or no authorization. Redirecting to login...", "error", 3000);
         if (finalizeLogoutProcess) {
-            setTimeout(() => finalizeLogoutProcess(), 3000);
+          setTimeout(() => finalizeLogoutProcess(), 3000);
         } else {
-            setTimeout(() => navigate("/"), 3000); // Fallback
+          setTimeout(() => navigate("/"), 3000);
         }
       } else {
-        setError("Не удалось загрузить оперативные сводки. Попробуйте обновить.");
+        setError("Failed to load operational briefings. Try refreshing.");
       }
       setLogs([]);
     } finally {
       setLoadingLogs(false);
     }
-  }, [sortCriteria, navigate, currentApiClient, finalizeLogoutProcess]); // Added dependencies
+  }, [sortCriteria, navigate, currentApiClient, finalizeLogoutProcess]);
 
   useEffect(() => {
     fetchLogs();
@@ -142,8 +134,7 @@ const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
 
   const filteredLogs = React.useMemo(() => logs.filter((log) => {
     const searchLower = searchQuery.toLowerCase();
-    const timeString = log.time ? new Date(log.time).toLocaleString('ru-RU').toLowerCase() : "";
-
+    const timeString = log.time ? new Date(log.time).toLocaleString('en-US').toLowerCase() : "";
     return (
       (!filterAction || log.action === filterAction) &&
       (!filterItem || log.item === filterItem) &&
@@ -159,42 +150,36 @@ const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
 
   const handleLogout = async () => {
     if (!currentApiClient) {
-        showMessage("Ошибка конфигурации для выхода.", "error");
-        // Fallback to basic cleanup if finalizeLogoutProcess is also missing
-        if (!finalizeLogoutProcess) {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("user");
-            window.location.href = "/";
-        } else {
-            finalizeLogoutProcess(); // Try to finalize even without API client for logout call
-        }
-        return;
+      showMessage("Configuration error for logout.", "error");
+      if (!finalizeLogoutProcess) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        window.location.href = "/";
+      } else {
+        finalizeLogoutProcess();
+      }
+      return;
     }
-
-    showMessage("Выход из системы...", "info", 10000);
-
+    showMessage("Logging out...", "info", 10000);
     try {
       await currentApiClient.post("/api/logout", {});
-      showMessage("Выход из системы успешно выполнен на сервере.", "success", 2000);
-
+      showMessage("Logout successfully executed on server.", "success", 2000);
       setTimeout(() => {
-        if (finalizeLogoutProcess) { // Prop is correctly referenced here
+        if (finalizeLogoutProcess) {
           finalizeLogoutProcess();
         } else {
-          console.error("finalizeLogoutProcess prop not available in Home.js. Performing manual cleanup.");
+          console.error("finalizeLogoutProcess prop not available. Performing manual cleanup.");
           localStorage.removeItem("authToken");
           localStorage.removeItem("csrfToken");
           localStorage.removeItem("user");
           window.location.href = "/";
         }
       }, 1500);
-
     } catch (err) {
-      console.error("Ошибка при выходе (API call or subsequent process):", err);
-      showMessage("Ошибка при выходе. Производится принудительная очистка...", "error", 3000);
-
+      console.error("Logout error (API call or subsequent process):", err);
+      showMessage("Logout error. Performing forced cleanup...", "error", 3000);
       setTimeout(() => {
-        if (finalizeLogoutProcess) { // Prop is correctly referenced here
+        if (finalizeLogoutProcess) {
           finalizeLogoutProcess();
         } else {
           console.error("finalizeLogoutProcess prop not available after error. Performing manual cleanup.");
@@ -228,139 +213,131 @@ const Home = ({ finalizeLogoutProcess, apiClient }) => { // Receive props here
         <div className="header-main-row">
           <div className="header-app-title-block">
             <FiGrid className="app-logo-icon"/>
-            <span className="header-app-title">СИСТЕМА ОПЕРАТИВНОГО УЧЕТА</span>
+            <span className="header-app-title">OPERATIONAL ACCOUNTING SYSTEM</span>
           </div>
           <div className="header-user-controls">
             <button className="styled-button icon-button" title={userDisplayName} onClick={() => navigate("/profile")}>
               <FiUser /> <span>{userDisplayName}</span>
             </button>
-            <button className="styled-button icon-button" title="Выход" onClick={handleLogout}>
-              <FiPower /> <span>Выход</span>
+            <button className="styled-button icon-button" title="Logout" onClick={handleLogout}>
+              <FiPower /> <span>Logout</span>
             </button>
           </div>
         </div>
         <nav className="header-nav-actions">
-            <button className="styled-button nav-action-button" onClick={() => navigate("/make-action")}>
-              <FiEdit3 /> Новая Запись
-            </button>
-            <button className="styled-button nav-action-button" onClick={() => navigate("/logs/download")}> {/* Assuming this route exists in App.js */}
-              <FiDownloadCloud /> Экспорт Журнала
-            </button>
+          <button className="styled-button nav-action-button" onClick={() => navigate("/make-action")}>
+            <FiEdit3 /> New Entry
+          </button>
+          <button className="styled-button nav-action-button" onClick={() => navigate("/logs/download")}>
+            <FiDownloadCloud /> Export Log
+          </button>
         </nav>
       </header>
-
       <main className="home-main-content">
         <div className="page-container">
-          <h1 className="main-page-title"><FiGrid /> ПАНЕЛЬ УПРАВЛЕНИЯ</h1>
-
+          <h1 className="main-page-title"><FiGrid /> CONTROL PANEL</h1>
           <section className="quick-access-section card-style">
-            <h2 className="section-title"><FiPocket /> ИНВЕНТАРЬ И РЕСУРСЫ</h2>
+            <h2 className="section-title"><FiPocket /> INVENTORY AND RESOURCES</h2>
             <div className="buttons-grid">
               <button className="styled-button quick-access-button" onClick={() => navigate("/weapons")}>
-                <FiHardDrive /> УЧЕТ ВООРУЖЕНИЯ
+                <FiHardDrive /> WEAPON ACCOUNTING
               </button>
               <button className="styled-button quick-access-button" onClick={() => navigate("/specials")}>
-                <FiCpu /> УЧЕТ СПЕЦСРЕДСТВ
+                <FiCpu /> SPECIAL MEANS ACCOUNTING
               </button>
             </div>
           </section>
-
           <section className="logs-section card-style">
             <div className="logs-header">
-              <h2 className="section-title"><FiList /> ОПЕРАТИВНАЯ СВОДКА</h2>
+              <h2 className="section-title"><FiList /> OPERATIONAL BRIEFING</h2>
               <button className="styled-button icon-button refresh-logs-button" onClick={fetchLogs} disabled={loadingLogs || !currentApiClient}>
                 {loadingLogs ? <FiLoader className="icon-spin" /> : <FiRefreshCw />}
-                {loadingLogs ? "ЗАГРУЗКА..." : (!currentApiClient ? "API НЕ ДОСТУПЕН" : "ОБНОВИТЬ")}
+                {loadingLogs ? "LOADING..." : (!currentApiClient ? "API NOT AVAILABLE" : "REFRESH")}
               </button>
             </div>
-
             <div className="search-filter-bar">
-                <div className="search-container">
+              <div className="search-container">
                 <FiSearch className="search-input-icon" />
                 <input
-                    type="text"
-                    placeholder="Поиск по сводкам..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="search-input"
+                  type="text"
+                  placeholder="Search briefings..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
                 />
-                </div>
+              </div>
             </div>
-
             <div className="filters-sort-container">
-              <h3 className="filters-title"><FiFilter/> Фильтры и сортировка</h3>
+              <h3 className="filters-title"><FiFilter/> Filters & Sorting</h3>
               <div className="filter-controls-grid">
                 <div className="filter-group">
-                  <label htmlFor="filter-action">ДЕЙСТВИЕ:</label>
+                  <label htmlFor="filter-action">ACTION:</label>
                   <select id="filter-action" value={filterAction} onChange={(e) => setFilterAction(e.target.value)}>
-                    <option value="">ВСЕ</option>
+                    <option value="">ALL</option>
                     {uniqueActions.map((action) => <option key={action} value={action}>{action.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="filter-group">
-                  <label htmlFor="filter-item">ОБЪЕКТ:</label>
+                  <label htmlFor="filter-item">OBJECT:</label>
                   <select id="filter-item" value={filterItem} onChange={(e) => setFilterItem(e.target.value)}>
-                    <option value="">ВСЕ</option>
+                    <option value="">ALL</option>
                     {uniqueItems.map((item) => <option key={item} value={item}>{item.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="filter-group">
-                  <label htmlFor="filter-status">СТАТУС:</label>
+                  <label htmlFor="filter-status">STATUS:</label>
                   <select id="filter-status" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-                    <option value="">ВСЕ</option>
+                    <option value="">ALL</option>
                     {uniqueStatuses.map((status) => <option key={status} value={status}>{status.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="filter-group">
-                  <label htmlFor="sort-criteria">СОРТИРОВКА:</label>
+                  <label htmlFor="sort-criteria">SORTING:</label>
                   <select id="sort-criteria" value={sortCriteria} onChange={(e) => setSortCriteria(e.target.value)}>
-                    <option value="time-desc">ПО ВРЕМЕНИ (НОВЫЕ)</option>
-                    <option value="time-asc">ПО ВРЕМЕНИ (СТАРЫЕ)</option>
-                    <option value="action">ПО ДЕЙСТВИЮ</option>
-                    <option value="item">ПО ОБЪЕКТУ</option>
+                    <option value="time-desc">BY TIME (NEWEST)</option>
+                    <option value="time-asc">BY TIME (OLDEST)</option>
+                    <option value="action">BY ACTION</option>
+                    <option value="item">BY OBJECT</option>
                   </select>
                 </div>
               </div>
             </div>
-
             <div className="logs-display-area">
-                {error && <p className="status-message error-message"><FiAlertCircle /> {error}</p>}
-                {(!currentApiClient && !error) && <p className="status-message error-message"><FiAlertCircle /> Ошибка конфигурации: API клиент не предоставлен.</p>}
-                {loadingLogs && !error && currentApiClient && <div className="status-container inline-loader"><FiLoader className="icon-spin" size={32}/><p>ЗАГРУЗКА СВОДОК...</p></div>}
-
-                {!loadingLogs && !error && currentApiClient && filteredLogs.length > 0 && (
+              {error && <p className="status-message error-message"><FiAlertCircle /> {error}</p>}
+              {(!currentApiClient && !error) && <p className="status-message error-message"><FiAlertCircle /> Configuration error: API client not provided.</p>}
+              {loadingLogs && !error && currentApiClient && <div className="status-container inline-loader"><FiLoader className="icon-spin" size={32}/><p>LOADING BRIEFINGS...</p></div>}
+              {!loadingLogs && !error && currentApiClient && filteredLogs.length > 0 && (
                 <ul className="logs-list">
-                    {filteredLogs.map((log) => (
+                  {filteredLogs.map((log) => (
                     <li key={log.id} className="log-item">
-                        <Link to={`/logs/full/${log.id}`} className="log-link-content">
-                            <div className="log-meta">
-                                <span className="log-time">{log.time ? new Date(log.time).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
-                                <span className="log-status-badge" data-status={log.status?.toLowerCase()}>{log.status || "N/A"}</span>
-                            </div>
-                            <div className="log-details">
-                                <span className="log-user"><FiUser className="log-detail-icon"/> {log.user || "Система"}</span>
-                                <span className="log-action"><FiTarget className="log-detail-icon"/> {log.action || "Не указано"}</span>
-                                {log.item && <span className="log-item-name"><FiCpu className="log-detail-icon"/> {log.item}</span>}
-                            </div>
-                            <FiEye className="log-view-indicator" title="Детали"/>
-                        </Link>
+                      <Link to={`/logs/full/${log.id}`} className="log-link-content">
+                        <div className="log-meta">
+                          <span className="log-time">{log.time ? new Date(log.time).toLocaleString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
+                          <span className="log-status-badge" data-status={log.status?.toLowerCase()}>{log.status || "N/A"}</span>
+                        </div>
+                        <div className="log-details">
+                          <span className="log-user"><FiUser className="log-detail-icon"/> {log.user || "System"}</span>
+                          <span className="log-action"><FiTarget className="log-detail-icon"/> {log.action || "Not specified"}</span>
+                          {log.item && <span className="log-item-name"><FiCpu className="log-detail-icon"/> {log.item}</span>}
+                        </div>
+                        <FiEye className="log-view-indicator" title="Details"/>
+                      </Link>
                     </li>
-                    ))}
+                  ))}
                 </ul>
-                )}
-                {!loadingLogs && !error && currentApiClient && logs.length > 0 && filteredLogs.length === 0 && (
-                    <p className="status-message no-results-message">По заданным параметрам сводки не найдены.</p>
-                )}
-                {!loadingLogs && !error && currentApiClient && logs.length === 0 && (
-                    <p className="status-message no-results-message">Оперативные сводки отсутствуют.</p>
-                )}
+              )}
+              {!loadingLogs && !error && currentApiClient && logs.length > 0 && filteredLogs.length === 0 && (
+                <p className="status-message no-results-message">No briefings found for the selected criteria.</p>
+              )}
+              {!loadingLogs && !error && currentApiClient && logs.length === 0 && (
+                <p className="status-message no-results-message">Operational briefings are missing.</p>
+              )}
             </div>
           </section>
         </div>
       </main>
-
       <footer className="home-footer">
-        <p>&copy; {new Date().getFullYear()} СЕКТОР АЛЬФА-7. КОНТРОЛЬ ОПЕРАЦИЙ. ДОСТУП ОГРАНИЧЕН.</p>
+        <p>&copy; {new Date().getFullYear()} SECTOR ALPHA-7. OPERATIONAL CONTROL. ACCESS RESTRICTED.</p>
       </footer>
     </div>
   );

@@ -8,18 +8,18 @@ import {
   FiRefreshCw,
   FiFilter,
   FiTag,
-  FiActivity, 
-  FiList,     
+  FiActivity,
+  FiList,
   FiSlash,
-  FiTarget,   
+  FiTarget,
   FiCalendar,
   FiFileText,
-  FiEye,      
+  FiEye,
 } from "react-icons/fi";
-import "../css/WeaponsPage.css"; 
+import "../css/WeaponsPage.css";
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000", 
+  baseURL: process.env.REACT_APP_API_URL || "http://217.71.129.139:5785",
   withCredentials: true,
 });
 
@@ -37,18 +37,18 @@ const WeaponsPage = () => {
     apiClient.get("/api/users/me")
       .then(() => { /* User is authenticated */ })
       .catch((err) => {
-        console.error("Ошибка авторизации при проверке /api/users/me:", err);
+        console.error("Ошибка авторизации при проверке /api/users/me:", err); // Developer-facing log
         if (err.response && (err.response.status === 401 || err.response.status === 403)) {
         }
       });
-  }, []); 
+  }, []);
 
   const fetchWeapons = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await apiClient.get("/api/weapons");
-      let fetchedWeapons = response.data.weapons || response.data || []; 
+      let fetchedWeapons = response.data.weapons || response.data || [];
 
       fetchedWeapons.sort((a, b) => {
         switch (sortCriteria) {
@@ -69,24 +69,24 @@ const WeaponsPage = () => {
 
       setWeapons(fetchedWeapons);
     } catch (err) {
-      console.error("Ошибка при загрузке оружия:", err);
+      console.error("Ошибка при загрузке оружия:", err); // Developer-facing log
       if (err.response) {
         if (err.response.status === 401 || err.response.status === 403) {
-          setError("Сессия истекла или доступ запрещен. Пожалуйста, войдите снова.");
-          localStorage.removeItem("csrfToken"); 
-          navigate("/login", { state: { message: "Пожалуйста, войдите снова." } });
+          setError("Session expired or access denied. Please log in again.");
+          localStorage.removeItem("csrfToken");
+          navigate("/login", { state: { message: "Please log in again." } });
         } else {
-          setError(`Не удалось загрузить список оружия. Сервер ответил: ${err.response.data?.message || err.response.status}`);
+          setError(`Failed to load weapons list. Server responded: ${err.response.data?.message || err.response.status}`);
         }
       } else if (err.request) {
-        setError("Не удалось связаться с сервером. Проверьте ваше интернет-соединение.");
+        setError("Could not connect to the server. Check your internet connection.");
       } else {
-        setError("Произошла ошибка при подготовке запроса: " + err.message);
+        setError("An error occurred while preparing the request: " + err.message);
       }
     } finally {
       setLoading(false);
     }
-  }, [sortCriteria, navigate]); 
+  }, [sortCriteria, navigate]);
 
   useEffect(() => {
     fetchWeapons();
@@ -104,18 +104,18 @@ const WeaponsPage = () => {
 
   if (loading) {
     return (
-      <div className="export-logs-page weapons-page"> 
-        <div className="page-container"> 
+      <div className="export-logs-page weapons-page">
+        <div className="page-container">
           <div className="status-container">
             <FiLoader className="icon-spin" size={48} />
-            <p>ЗАГРУЗКА СПИСКА ВООРУЖЕНИЯ...</p>
+            <p>LOADING WEAPONS LIST...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (error && weapons.length === 0) { 
+  if (error && weapons.length === 0) {
     return (
       <div className="export-logs-page weapons-page">
         <div className="page-container">
@@ -124,11 +124,11 @@ const WeaponsPage = () => {
             <p className="error-message">{error}</p>
             <div className="status-actions">
               <button onClick={() => navigate("/login")} className="styled-button">
-                Перейти на страницу входа
+                Go to Login Page
               </button>
               <button onClick={fetchWeapons} className="styled-button button-secondary">
                 <FiRefreshCw className="button-icon" />
-                Попробовать снова
+                Try Again
               </button>
             </div>
           </div>
@@ -136,15 +136,15 @@ const WeaponsPage = () => {
       </div>
     );
   }
-  
+
   return (
-    <div className="export-logs-page weapons-page"> 
-      <div className="page-container"> 
+    <div className="export-logs-page weapons-page">
+      <div className="page-container">
         <header className="page-header">
-          <h1>{"// АРСЕНАЛ: СПИСОК ВООРУЖЕНИЯ //"}</h1>
+          <h1>{"// ARMORY: WEAPONS LIST //"}</h1>
           <button className="styled-button back-button" onClick={() => navigate(-1)}>
             <FiArrowLeftCircle className="button-icon" />
-            Назад
+            Back
           </button>
         </header>
 
@@ -152,15 +152,15 @@ const WeaponsPage = () => {
           <div className="card-style filters-controls-card">
             <h2 className="section-title">
               <FiFilter className="title-icon" />
-              {"// БЛОК УПРАВЛЕНИЯ И ФИЛЬТРАЦИИ //"}
+              {"// CONTROL AND FILTERING BLOCK //"}
             </h2>
             <div className="filter-grid">
               <div className="filter-group">
                 <label htmlFor="filter-type">
-                  <FiTag className="label-icon" /> ТИП ВООРУЖЕНИЯ:
+                  <FiTag className="label-icon" /> WEAPON TYPE:
                 </label>
                 <select id="filter-type" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-                  <option value="">Все типы</option>
+                  <option value="">All Types</option>
                   {uniqueTypes.map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
@@ -169,10 +169,10 @@ const WeaponsPage = () => {
 
               <div className="filter-group">
                 <label htmlFor="filter-status">
-                  <FiActivity className="label-icon" /> БОЕВОЙ СТАТУС:
+                  <FiActivity className="label-icon" /> COMBAT STATUS:
                 </label>
                 <select id="filter-status" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-                  <option value="">Все статусы</option>
+                  <option value="">All Statuses</option>
                   {uniqueStatuses.map(status => (
                     <option key={status} value={status}>{status}</option>
                   ))}
@@ -181,50 +181,50 @@ const WeaponsPage = () => {
 
               <div className="filter-group">
                 <label htmlFor="sort-criteria">
-                  <FiList className="label-icon" /> КРИТЕРИЙ СОРТИРОВКИ:
+                  <FiList className="label-icon" /> SORT CRITERIA:
                 </label>
                 <select id="sort-criteria" value={sortCriteria} onChange={(e) => setSortCriteria(e.target.value)}>
-                  <option value="name">По названию (А-Я)</option>
-                  <option value="type">По типу</option>
-                  <option value="status">По статусу</option>
-                  <option value="lastMaintenance">По дате обслуживания (сначала новые)</option>
+                  <option value="name">By Name (A-Z)</option>
+                  <option value="type">By Type</option>
+                  <option value="status">By Status</option>
+                  <option value="lastMaintenance">By Maintenance Date (Newest First)</option>
                 </select>
               </div>
             </div>
             <div className="controls-actions">
                 <button className="styled-button" onClick={fetchWeapons}>
                     <FiRefreshCw className="button-icon" />
-                    Обновить данные с сервера
+                    Refresh Data from Server
                 </button>
             </div>
           </div>
-          
+
           {error && <p className="error-message inline-error"><FiAlertTriangle/> {error}</p>}
 
 
           {filteredWeapons.length > 0 ? (
-            <ul className="weapon-list"> 
+            <ul className="weapon-list">
               {filteredWeapons.map((weapon) => (
-                <li key={weapon.id} className="weapon-card-item card-style"> 
+                <li key={weapon.id} className="weapon-card-item card-style">
                   <Link to={`/weapons/${weapon.id}`} className="weapon-link-wrapper">
                     <div className="weapon-card-header">
                         <h3>
                             <FiTarget className="title-icon"/>{" "}
-                            {weapon.name || "Н/Д"}
+                            {weapon.name || "N/A"}
                         </h3>
                     </div>
                     <div className="weapon-card-body">
-                        <p><FiTag className="detail-icon" /> <strong>Тип:</strong> {weapon.typeName || "Не указан"}</p>
-                        <p><FiActivity className="detail-icon" /> <strong>Статус:</strong> {weapon.statusName || "Не определен"}</p>
-                        <p><FiCalendar className="detail-icon" /> <strong>Обслужено:</strong> {weapon.lastMaintenance ? new Date(weapon.lastMaintenance).toLocaleDateString() : "Н/Д"}</p>
+                        <p><FiTag className="detail-icon" /> <strong>Type:</strong> {weapon.typeName || "Not specified"}</p>
+                        <p><FiActivity className="detail-icon" /> <strong>Status:</strong> {weapon.statusName || "Undefined"}</p>
+                        <p><FiCalendar className="detail-icon" /> <strong>Maintained:</strong> {weapon.lastMaintenance ? new Date(weapon.lastMaintenance).toLocaleDateString() : "N/A"}</p>
                         <p className="description">
-                            <FiFileText className="detail-icon" /> 
-                            <strong>Описание:</strong> {weapon.description || "Нет описания"}
+                            <FiFileText className="detail-icon" />
+                            <strong>Description:</strong> {weapon.description || "No description"}
                         </p>
                     </div>
                     <div className="weapon-card-footer">
-                        <span className="styled-button button-sm button-secondary"> 
-                            <FiEye className="button-icon"/> Подробнее
+                        <span className="styled-button button-sm button-secondary">
+                            <FiEye className="button-icon"/> Details
                         </span>
                     </div>
                   </Link>
@@ -232,16 +232,16 @@ const WeaponsPage = () => {
               ))}
             </ul>
           ) : (
-             !loading && !error && ( 
+             !loading && !error && (
                 <div className="status-container no-data-card card-style">
                     <FiSlash size={48} />
-                    <p className="no-data-message">ЕДИНИЦЫ ВООРУЖЕНИЯ, СООТВЕТСТВУЮЩИЕ КРИТЕРИЯМ, НЕ НАЙДЕНЫ.</p>
+                    <p className="no-data-message">NO WEAPON UNITS FOUND MATCHING THE CRITERIA.</p>
                     { (filterType || filterStatus) &&
                         <button
                             className="styled-button button-secondary"
                             onClick={() => { setFilterType(''); setFilterStatus(''); }}
                         >
-                            Сбросить фильтры
+                            Reset Filters
                         </button>
                     }
                 </div>

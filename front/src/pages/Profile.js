@@ -8,25 +8,25 @@ import {
   FiAlertTriangle,
   FiLoader,
   FiArrowLeftCircle,
-  FiTag 
+  FiTag
 } from "react-icons/fi";
-import "../css/ProfilePage.css"; 
+import "../css/ProfilePage.css";
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
-  withCredentials: true, 
+  baseURL: process.env.REACT_APP_API_URL || "http://217.71.129.139:5785",
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use(
   (config) => {
     const methodsRequiringCsrf = ["post", "put", "delete", "patch"];
     if (methodsRequiringCsrf.includes(config.method.toLowerCase())) {
-      const csrfToken = localStorage.getItem("csrfToken");
+      const csrfToken = localStorage.getItem("csrfToken"); // Assuming CSRF token is stored in localStorage for this component
       if (csrfToken) {
         config.headers["X-CSRF-Token"] = csrfToken;
       } else {
         console.warn(
-          "CSRF токен не найден в localStorage для изменяющего запроса."
+          "CSRF token not found in localStorage for state-changing request."
         );
       }
     }
@@ -52,38 +52,38 @@ const Profile = () => {
         if (response.data && response.data.user) {
           setUser(response.data.user);
         } else if (response.data && !response.data.user) {
-          setUser(response.data);
+          setUser(response.data); // Use response.data directly if 'user' field is missing
           console.warn(
-            "Ответ API '/api/users/me' не содержит поля 'user'. Используется response.data напрямую."
+            "API response for '/api/users/me' does not contain a 'user' field. Using response.data directly."
           );
         } else {
-          throw new Error("Ответ API не содержит данных пользователя.");
+          throw new Error("API response does not contain user data.");
         }
       } catch (err) {
-        console.error("Ошибка при получении данных пользователя:", err);
+        console.error("Error fetching user data:", err);
         if (err.response) {
-          console.error("Данные ответа об ошибке:", err.response.data);
-          console.error("Статус ответа об ошибке:", err.response.status);
+          console.error("Error response data:", err.response.data);
+          console.error("Error response status:", err.response.status);
           if (err.response.status === 401 || err.response.status === 403) {
-            setError("Ошибка авторизации. Возможно, ваша сессия истекла.");
-            localStorage.removeItem("csrfToken");
+            setError("Authorization error. Your session may have expired.");
+            localStorage.removeItem("csrfToken"); // Clear token on auth error
             navigate("/login", {
-              state: { message: "Пожалуйста, войдите снова." },
+              state: { message: "Please log in again." },
             });
           } else {
             setError(
-              `Не удалось получить данные пользователя. Сервер ответил: ${
+              `Failed to get user data. Server responded: ${
                 err.response.data?.message || err.response.status
               }`
             );
           }
         } else if (err.request) {
           setError(
-            "Не удалось связаться с сервером. Проверьте ваше интернет-соединение."
+            "Could not connect to the server. Check your internet connection."
           );
         } else {
           setError(
-            "Произошла ошибка при подготовке запроса: " + err.message
+            "An error occurred while preparing the request: " + err.message
           );
         }
       } finally {
@@ -98,7 +98,7 @@ const Profile = () => {
     return (
       <div className="profile-status-container">
         <FiLoader className="icon-spin" size={48} />
-        <p>ЗАГРУЗКА ПРОФИЛЯ...</p>
+        <p>LOADING PROFILE...</p>
       </div>
     );
 
@@ -108,7 +108,7 @@ const Profile = () => {
         <FiAlertTriangle size={48} />
         <p className="error-message">{error}</p>
         <button onClick={() => navigate("/login")} className="styled-button">
-          Попробовать войти
+          Try to Log In
         </button>
       </div>
     );
@@ -118,7 +118,7 @@ const Profile = () => {
       <div className="profile-status-container error-container">
         <FiAlertTriangle size={48} />
         <p className="error-message">
-          Данные пользователя не найдены или не удалось загрузить.
+          User data not found or could not be loaded.
         </p>
       </div>
     );
@@ -139,40 +139,40 @@ const Profile = () => {
         <main className="profile-main">
           <div className="profile-card">
             <div className="profile-card-header">
-              <h2>{"// ИНФОРМАЦИОННЫЙ БЛОК //"}</h2>
+              <h2>{"// INFORMATION BLOCK //"}</h2>
             </div>
             <dl className="profile-details">
               <div className="profile-detail-item">
                 <dt>
                   <FiUser className="detail-icon" />
-                  ОПЕРАТОР:
+                  OPERATOR:
                 </dt>
-                <dd>{fullName || "Н/Д"}</dd>
+                <dd>{fullName || "N/A"}</dd>
               </div>
 
               <div className="profile-detail-item">
                 <dt>
                   <FiShield className="detail-icon" />
-                  КЛАССИФИКАЦИЯ:
+                  CLASSIFICATION:
                 </dt>
-                <dd>{user.role?.name || "НЕ ОПРЕДЕЛЕНА"}</dd>
+                <dd>{user.role?.name || "NOT DEFINED"}</dd>
               </div>
 
               {user.username && (
                 <div className="profile-detail-item">
                   <dt>
-                    <FiTag className="detail-icon" /> 
-                    ПОЗЫВНОЙ:
+                    <FiTag className="detail-icon" />
+                    CALLSIGN:
                   </dt>
                   <dd>{user.username}</dd>
                 </div>
               )}
-              
+
               {user.email && (
                 <div className="profile-detail-item">
                   <dt>
                     <FiMail className="detail-icon" />
-                    КАНАЛ СВЯЗИ (EMAIL):
+                    COMMUNICATION CHANNEL (EMAIL):
                   </dt>
                   <dd>{user.email}</dd>
                 </div>
@@ -180,11 +180,11 @@ const Profile = () => {
             </dl>
           </div>
           <button
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate(-1)}
             className="styled-button back-button"
           >
             <FiArrowLeftCircle className="button-icon" />
-            ВЕРНУТЬСЯ
+            RETURN
           </button>
         </main>
       </div>

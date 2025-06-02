@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom"; 
+import { useParams, Link } from "react-router-dom";
 import {
   FiLoader,
   FiAlertTriangle,
   FiArrowLeft,
   FiUser,
   FiActivity,
-  FiTarget, 
-  FiCpu,    
-  FiMessageSquare, 
-  FiInfo,  
-  FiCalendar 
+  FiTarget,
+  FiCpu,
+  FiMessageSquare,
+  FiInfo,
+  FiCalendar
 } from "react-icons/fi";
 import "../css/LogDetail.css";
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  baseURL: process.env.REACT_APP_API_URL || 'http://217.71.129.139:5785',
   withCredentials: true,
 });
 
@@ -27,19 +27,12 @@ apiClient.interceptors.request.use(
       const csrfToken = localStorage.getItem("csrfToken");
       if (csrfToken) {
         config.headers["X-CSRF-Token"] = csrfToken;
-      } else {
-        console.warn(
-          "CSRF токен не найден в localStorage для изменяющего запроса."
-        );
       }
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
-
 
 const LogDetail = () => {
   const { id } = useParams();
@@ -50,7 +43,7 @@ const LogDetail = () => {
   useEffect(() => {
     const logId = parseInt(id, 10);
     if (!id || isNaN(logId) || logId <= 0) {
-      setError("Неверный или отсутствующий ID записи.");
+      setError("Invalid or missing record ID.");
       setLoading(false);
       return;
     }
@@ -59,31 +52,31 @@ const LogDetail = () => {
 
   const fetchLogDetails = async (logId) => {
     setLoading(true);
-    setError(null); 
+    setError(null);
     try {
       const response = await apiClient.get(`/api/logs/full/${logId}`);
       if (response.data && response.data.log) {
         setLog(response.data.log);
       } else {
-        setLog(null); 
-        setError(`Запись с ID ${logId} не найдена.`);
+        setLog(null);
+        setError(`Record with ID ${logId} not found.`);
       }
     } catch (err) {
-      console.error("Ошибка при получении деталей лога:", err);
+      console.error("Error fetching log details:", err);
       if (err.response) {
         if (err.response.status === 404) {
-          setError(`Запись с ID ${logId} не найдена.`);
-        } else if (err.response.status === 401 || err.response.status === 403) {
-          setError("Ошибка авторизации. Пожалуйста, войдите снова.");
+          setError(`Record with ID ${logId} not found.`);
+        } else if ([401, 403].includes(err.response.status)) {
+          setError("Authentication error. Please log in again.");
         } else {
-          setError(`Не удалось получить информацию о логе (Статус: ${err.response.status}). Пожалуйста, попробуйте еще раз.`);
+          setError(`Failed to get log info (Status: ${err.response.status}). Try again.`);
         }
       } else if (err.request) {
-        setError("Сервер не отвечает. Проверьте ваше интернет-соединение.");
+        setError("Server not responding. Check internet connection.");
       } else {
-        setError("Произошла ошибка при подготовке запроса.");
+        setError("Request preparation error.");
       }
-      setLog(null); 
+      setLog(null);
     } finally {
       setLoading(false);
     }
@@ -93,32 +86,32 @@ const LogDetail = () => {
     return (
       <div className="log-status-container">
         <FiLoader className="icon-spin" size={48} />
-        <p>ЗАГРУЗКА ДЕТАЛЕЙ ЗАПИСИ...</p>
+        <p>LOADING RECORD DETAILS...</p>
       </div>
     );
   }
 
-  if (error && !log) { 
+  if (error && !log) {
     return (
       <div className="log-status-container error-container-log">
         <FiAlertTriangle size={48} />
         <p className="error-text">{error}</p>
         <Link to="/logs" className="styled-button back-button-log">
           <FiArrowLeft className="button-icon" />
-          Назад к списку логов
+          BACK TO LOGS
         </Link>
       </div>
     );
   }
 
-  if (!log) { 
+  if (!log) {
     return (
       <div className="log-status-container">
         <FiInfo size={48} />
-        <p>Данные о логе не найдены или не были загружены.</p>
+        <p>Log data not found or failed to load.</p>
         <Link to="/logs" className="styled-button back-button-log">
           <FiArrowLeft className="button-icon" />
-          Назад к списку логов
+          BACK TO LOGS
         </Link>
       </div>
     );
@@ -127,69 +120,68 @@ const LogDetail = () => {
   const getStatusClass = (status) => {
     if (!status) return 'unknown';
     const lowerStatus = status.toLowerCase();
-    if (lowerStatus.includes('success') || lowerStatus.includes('успешно') || lowerStatus.includes('ok')) return 'success';
-    if (lowerStatus.includes('fail') || lowerStatus.includes('error') || lowerStatus.includes('ошибка')) return 'error';
-    if (lowerStatus.includes('warn') || lowerStatus.includes('предупреждение')) return 'warning';
-    if (lowerStatus.includes('info') || lowerStatus.includes('информация')) return 'info';
-    return 'default'; 
+    if (lowerStatus.includes('success') || lowerStatus.includes('ok')) return 'success';
+    if (lowerStatus.includes('fail') || lowerStatus.includes('error')) return 'error';
+    if (lowerStatus.includes('warn')) return 'warning';
+    if (lowerStatus.includes('info')) return 'info';
+    return 'default';
   };
-
 
   return (
     <div className="log-detail-page">
       <header className="log-detail-header">
-        <h1>{"// ДЕТАЛИЗАЦИЯ ОПЕРАТИВНОЙ ЗАПИСИ //"}</h1>
+        <h1>// OPERATION LOG DETAILIZATION //</h1>
         <Link to="/home" className="styled-button back-button-header">
           <FiArrowLeft className="button-icon" />
-          К СПИСКУ ЗАПИСЕЙ
+          TO RECORDS LIST
         </Link>
       </header>
 
       <main className="log-detail-content">
         <div className="log-card">
           <div className="log-card-header">
-            <h2>АНАЛИЗ ЗАПИСИ #{log.id || id}</h2>
+            <h2>ANALYSIS OF RECORD #{log.id || id}</h2>
           </div>
           <dl className="log-attributes">
             <div className="log-attribute">
-              <dt><FiCalendar className="detail-icon" />ВРЕМЯ ФИКСАЦИИ:</dt>
-              <dd>{log.time ? new Date(log.time).toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'medium' }) : 'Н/Д'}</dd>
+              <dt><FiCalendar className="detail-icon" />CAPTURE TIME:</dt>
+              <dd>{log.time ? new Date(log.time).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' }) : 'N/A'}</dd>
             </div>
 
             <div className="log-attribute">
-              <dt><FiUser className="detail-icon" />ОПЕРАТОР:</dt>
-              <dd>{log.user_name || log.user || 'НЕ УКАЗАН'}</dd> 
+              <dt><FiUser className="detail-icon" />OPERATOR:</dt>
+              <dd>{log.user_name || log.user || 'NOT SPECIFIED'}</dd>
             </div>
 
             <div className="log-attribute">
-              <dt><FiActivity className="detail-icon" />ТИП ОПЕРАЦИИ:</dt>
-              <dd>{log.action_type || log.action || 'НЕ УКАЗАН'}</dd> 
+              <dt><FiActivity className="detail-icon" />OPERATION TYPE:</dt>
+              <dd>{log.action_type || log.action || 'NOT SPECIFIED'}</dd>
             </div>
 
             {log.weapon && (
               <div className="log-attribute">
-                <dt><FiTarget className="detail-icon" />ИСПОЛЬЗОВАНО ОРУЖИЕ:</dt>
+                <dt><FiTarget className="detail-icon" />WEAPON USED:</dt>
                 <dd>{log.weapon}</dd>
               </div>
             )}
 
-            {log.special_device && ( 
+            {log.special_device && (
               <div className="log-attribute">
-                <dt><FiCpu className="detail-icon" />СПЕЦ. УСТРОЙСТВО:</dt>
+                <dt><FiCpu className="detail-icon" />SPECIAL DEVICE:</dt>
                 <dd>{log.special_device || log.special}</dd>
               </div>
             )}
             
             <div className="log-attribute log-attribute-full">
-              <dt><FiMessageSquare className="detail-icon" />ДЕТАЛИЗАЦИЯ / КОММЕНТАРИЙ:</dt>
-              <dd className="comment-dd">{log.comment || "ОТСУТСТВУЕТ"}</dd>
+              <dt><FiMessageSquare className="detail-icon" />DETAILS / COMMENT:</dt>
+              <dd className="comment-dd">{log.comment || "ABSENT"}</dd>
             </div>
 
             <div className="log-attribute">
-              <dt><FiInfo className="detail-icon" />СТАТУС ОПЕРАЦИИ:</dt>
+              <dt><FiInfo className="detail-icon" />OPERATION STATUS:</dt>
               <dd>
                 <span className={`log-status-badge status-${getStatusClass(log.status)}`}>
-                  {log.status || "НЕ ОПРЕДЕЛЕН"}
+                  {log.status || "UNDEFINED"}
                 </span>
               </dd>
             </div>
@@ -198,7 +190,7 @@ const LogDetail = () => {
       </main>
 
       <footer className="log-detail-footer">
-        <p>&copy; {new Date().getFullYear()}{"// СИСТЕМА ОПЕРАТИВНОГО ЛОГИРОВАНИЯ ПРОТОКОЛ_Z // АРХИВ ЗАПИСЕЙ //"}</p>
+        <p>&copy; {new Date().getFullYear()} // OPERATIONAL LOGGING SYSTEM PROTOCOL_Z // RECORDS ARCHIVE //</p>
       </footer>
     </div>
   );

@@ -4,32 +4,33 @@ import { useNavigate } from 'react-router-dom';
 import { FiUser, FiLock, FiLogIn, FiX, FiAlertTriangle, FiLoader } from 'react-icons/fi';
 import '../css/LoginPage.css';
 
+// apiClient can be configured globally or used locally depending on CSRF handling for login.
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  baseURL: process.env.REACT_APP_API_URL || 'http://217.71.129.139:5785',
   withCredentials: true,
 });
 
-const LoginPage = ({ onLoginSuccess }) => { // <-- Деструктурируем onLoginSuccess из props
+const LoginPage = ({ onLoginSuccess }) => { // Destructure onLoginSuccess from props
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // apiClient для LoginPage.js можно оставить как есть, т.к. для /api/login
-  // обычно не нужен Authorization header и CSRF может обрабатываться иначе.
-  // Если же /api/login требует CSRF из куки, то лучше использовать общий apiClient из App.js
+  // localApiClient for LoginPage.js can remain as is, as /api/login
+  // usually doesn't need an Authorization header, and CSRF might be handled differently.
+  // If /api/login requires CSRF from a cookie, it's better to use a shared apiClient (e.g., from App.js).
   const localApiClient = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+    baseURL: process.env.REACT_APP_API_URL || 'http://217.71.129.139:5785',
     withCredentials: true,
   });
 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (!username || !password) {
-      setError('Пожалуйста, введите логин и пароль.');
+      setError('Please enter username and password.');
       return;
     }
 
@@ -37,7 +38,7 @@ const LoginPage = ({ onLoginSuccess }) => { // <-- Деструктурируе�
     setLoading(true);
 
     try {
-      const response = await localApiClient.post('/api/login', { // Используем localApiClient
+      const response = await localApiClient.post('/api/login', { // Using localApiClient
         username,
         password,
       });
@@ -46,45 +47,46 @@ const LoginPage = ({ onLoginSuccess }) => { // <-- Деструктурируе�
 
       if (success) {
         localStorage.setItem('authToken', token);
-        // csrfToken из ответа логина сохраняется. Интерсептор в App.js попытается сначала взять из куки,
-        // потом может использовать этот из localStorage как fallback.
+        // csrfToken from login response is saved.
+        // An interceptor (e.g., in App.js) might first try to get it from a cookie,
+        // then could use this from localStorage as a fallback.
         if (csrfToken) {
             localStorage.setItem('csrfToken', csrfToken);
         }
-        
+
         setUsername('');
         setPassword('');
         setError('');
 
-        // console.log('LoginPage: Авторизация успешна:', { user, token, csrfToken });
+        // console.log('LoginPage: Authentication successful:', { user, token, csrfToken });
 
         if (onLoginSuccess) {
-          onLoginSuccess(); // <-- ВЫЗЫВАЕМ КОЛБЭК ПЕРЕД НАВИГАЦИЕЙ
+          onLoginSuccess(); // CALL CALLBACK BEFORE NAVIGATION
         }
 
         navigate('/home');
       } else {
-        setError(message || 'Произошла ошибка при входе.');
+        setError(message || 'An error occurred during login.');
       }
     } catch (err) {
-      // console.error("LoginPage: Ошибка при входе:", err);
-      
-      localStorage.removeItem('csrfToken'); // Удаляем, если была ошибка с CSRF
-      
+      // console.error("LoginPage: Login error:", err);
+
+      localStorage.removeItem('csrfToken'); // Remove if there was a CSRF error
+
       if (err.response) {
         if (err.response.status === 401) {
-          setError("Неверный логин или пароль.");
+          setError("Invalid username or password.");
         } else if (err.response.status === 403) {
-          setError("Ошибка доступа или CSRF-токена. Попробуйте обновить страницу.");
+          setError("Access error or CSRF token issue. Try refreshing the page.");
         } else if (err.response.status >= 500) {
-          setError("Ошибка на сервере. Повторите попытку позже.");
+          setError("Server error. Please try again later.");
         } else {
-          setError(err.response.data?.message || `Ошибка: ${err.response.status}`);
+          setError(err.response.data?.message || `Error: ${err.response.status}`);
         }
       } else if (err.request) {
-        setError("Сервер не отвечает. Проверьте интернет-соединение.");
+        setError("Server not responding. Check your internet connection.");
       } else {
-        setError("Ошибка при подготовке запроса.");
+        setError("Error preparing the request.");
       }
     } finally {
       setLoading(false);
@@ -93,19 +95,19 @@ const LoginPage = ({ onLoginSuccess }) => { // <-- Деструктурируе�
 
   return (
     <div className="login-page-wrapper">
-      <div className="login-form-container"> 
+      <div className="login-form-container">
         <header className="login-header">
-          <h1>{"// СИСТЕМА АУТЕНТИФИКАЦИИ //"}</h1>
-          <p>{"ТРЕБУЕТСЯ ВВОД УЧЕТНЫХ ДАННЫХ ОПЕРАТОРА"}</p>
+          <h1>{"// AUTHENTICATION SYSTEM //"}</h1>
+          <p>{"OPERATOR CREDENTIALS REQUIRED"}</p>
         </header>
 
         {error && (
           <div className="error-message-banner" role="alert">
             <FiAlertTriangle className="error-icon" />
             <span className="error-text">{error}</span>
-            <button 
-              onClick={() => setError('')} 
-              aria-label="Закрыть сообщение об ошибке"
+            <button
+              onClick={() => setError('')}
+              aria-label="Close error message"
               className="close-error-button"
             >
               <FiX />
@@ -115,37 +117,37 @@ const LoginPage = ({ onLoginSuccess }) => { // <-- Деструктурируе�
 
         <form onSubmit={handleSubmit} className="login-form-main">
           <div className="form-group">
-            <label htmlFor="username">ПОЗЫВНОЙ / LOGIN</label>
+            <label htmlFor="username">CALLSIGN / LOGIN</label>
             <div className="input-group">
               <FiUser className="input-icon" />
               <input
                 id="username"
                 type="text"
-                placeholder="Введите ваш позывной..."
+                placeholder="Enter your callsign..."
                 className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 autoComplete="username"
-                aria-describedby={error && username === '' ? "error-text-id" : undefined} 
+                aria-describedby={error && username === '' ? "error-text-id" : undefined}
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">СЕКРЕТНЫЙ КОД / PASSWORD</label>
+            <label htmlFor="password">SECRET CODE / PASSWORD</label>
             <div className="input-group">
               <FiLock className="input-icon" />
               <input
                 id="password"
                 type="password"
-                placeholder="Введите ваш код доступа..."
+                placeholder="Enter your access code..."
                 className="form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                aria-describedby={error && password === '' ? "error-text-id" : undefined} 
+                aria-describedby={error && password === '' ? "error-text-id" : undefined}
               />
             </div>
           </div>
@@ -154,12 +156,12 @@ const LoginPage = ({ onLoginSuccess }) => { // <-- Деструктурируе�
             {loading ? (
               <>
                 <FiLoader className="button-icon icon-spin" />
-                АУТЕНТИФИКАЦИЯ...
+                AUTHENTICATING...
               </>
             ) : (
               <>
                 <FiLogIn className="button-icon" />
-                ВОЙТИ В СИСТЕМУ
+                LOG IN TO SYSTEM
               </>
             )}
           </button>

@@ -25,17 +25,6 @@ if (pdfFontsModule && pdfFontsModule.pdfMake && pdfFontsModule.pdfMake.vfs) {
     pdfMake.vfs = pdfFontsModule;
 }
 
-if (!pdfMake.vfs || Object.keys(pdfMake.vfs).length === 0) {
-    console.error(
-        "CRITICAL: pdfMake.vfs is not populated. PDF generation with embedded fonts (like Roboto) will likely fail. " +
-        "Troubleshooting steps: \n" +
-        "1. Ensure 'pdfmake' is installed correctly (try deleting node_modules and package-lock.json, then 'npm install').\n" +
-        "2. Verify that 'pdfmake/build/vfs_fonts.js' exists and is valid in your node_modules directory.\n" +
-        "3. Check console warnings from the VFS loading logic above for clues."
-    );
-}
-
-
 const { createObjectCsvWriter } = require('csv-writer');
 const ExcelJS = require('exceljs');
 
@@ -43,7 +32,8 @@ const app = express();
 const port = process.env.PORT || 5000; 
 
 const corsOptions = {
-  origin: ['http://localhost:80', 'http://localhost:3000', 'http://localhost:5000'], 
+  origin: ['http://localhost:80', 'http://localhost:3000', 'http://localhost:5000', 'http://217.71.129.139:5785',
+    'http://217.71.129.139:5784','http://172.17.7.208:3000', 'http://172.17.7.208:5000', 'http://172.17.7.208'], 
   credentials: true,
 };
 
