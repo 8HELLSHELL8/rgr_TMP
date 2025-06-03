@@ -518,25 +518,144 @@ app.get('/api/action-statuses', authenticateToken, async (req, res) => {
   }
 });
 
-app.post('/api/logs', authenticateToken, verifyCsrfToken, async (req, res) => { // Added verifyCsrfToken
-  const { soldier, action_type, gun_taken, specials_taken, comment, status } = req.body; // Added status
 
-  if (!soldier || !action_type || !status) { // Made status mandatory for new logs
-    return res.status(400).json({ success: false, message: 'Солдат, действие и статус обязательны (Bad Request: Soldier, action, and status are required)' });
+app.post('/api/logs', authenticateToken, verifyCsrfToken, async (req, res) => {
+
+
+  const ACTION_TAKEN_ID = 1;       
+  const ACTION_RETURNED_ID = 2;    
+  const ACTION_MAINTENANCE_ID = 3; 
+
+  const STATUS_IN_STOCK_ID = 1;    
+  const STATUS_ISSUED_ID = 2;      
+  const STATUS_TAKEN_ID = 3;      
+  const STATUS_UNDER_REPAIR_ID = 4; 
+
+  const { soldier, action_type, gun_taken, specials_taken, comment, status } = req.body;
+
+  if (!soldier || !action_type || !status) {
+    return res.status(400).json({ success: false, message: 'Солдат, тип действия и статус лога обязательны (Bad Request: Soldier, action type, and log status are required)' });
   }
 
+  const parsedActionType = parseInt(action_type, 10);
+  if (isNaN(parsedActionType)) {
+    return res.status(400).json({ success: false, message: 'Тип действия должен быть числом (Action type must be a number)' });
+  }
+
+  const client = await pool.connect();
+
   try {
-    // Assuming 'status' from req.body is the ID for action_status table
-    const result = await pool.query(`
+    await client.query('BEGIN');
+
+    // 1. Insert the log entry
+    const logInsertResult = await client.query(`
       INSERT INTO logs (soldier, action_type, gun_taken, specials_taken, comment, status)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id
-    `, [soldier, action_type, gun_taken || null, specials_taken || null, comment || null, status]);
+    `, [soldier, parsedActionType, gun_taken || null, specials_taken || null, comment || null, status]);
 
-    const newLogId = result.rows[0].id;
+    const newLogId = logInsertResult.rows[0].id;
 
+    let gunUpdateAttempted = false;
+    let gunUpdateSucceeded = false;
+    let specialUpdateAttempted = false;
+    let specialUpdateSucceeded = false;
+
+    // --- Handle Weapon Status Update ---
+    if (gun_taken) {
+      gunUpdateAttempted = true;
+      let weaponUpdateResult;
+      if (parsedActionType === ACTION_TAKEN_ID) {
+        weaponUpdateResult = await client.query(
+          'UPDATE weapon SET status = $1 WHERE id = $2 AND status = $3', // Must be 'In Stock' to be 'Taken'
+          [STATUS_TAKEN_ID, gun_taken, STATUS_IN_STOCK_ID]
+        );
+        if (weaponUpdateResult.rowCount > 0) gunUpdateSucceeded = true;
+      } else if (parsedActionType === ACTION_RETURNED_ID) {
+        weaponUpdateResult = await client.query(
+          'UPDATE weapon SET status = $1 WHERE id = $2 AND status IN ($3, $4, $5)', // Can be returned if 'Taken', 'Issued', or 'Under Repair'
+          [STATUS_IN_STOCK_ID, gun_taken, STATUS_TAKEN_ID, STATUS_ISSUED_ID, STATUS_UNDER_REPAIR_ID]
+        );
+        if (weaponUpdateResult.rowCount > 0) gunUpdateSucceeded = true;
+      } else if (parsedActionType === ACTION_MAINTENANCE_ID) {
+        weaponUpdateResult = await client.query(
+          'UPDATE weapon SET status = $1 WHERE id = $2 AND status IN ($3, $4, $5)', // Can be sent for maintenance if 'In Stock', 'Issued', or 'Taken'
+          [STATUS_UNDER_REPAIR_ID, gun_taken, STATUS_IN_STOCK_ID, STATUS_ISSUED_ID, STATUS_TAKEN_ID]
+        );
+        if (weaponUpdateResult.rowCount > 0) gunUpdateSucceeded = true;
+      }
+
+      if (gunUpdateSucceeded) {
+        console.log(`[LOG ACTION] Weapon ID ${gun_taken} status updated successfully for action type ${parsedActionType}.`);
+      } else if (parsedActionType === ACTION_TAKEN_ID || parsedActionType === ACTION_RETURNED_ID || parsedActionType === ACTION_MAINTENANCE_ID) {
+        const currentStatusRes = await client.query('SELECT status FROM weapon WHERE id = $1', [gun_taken]); // Check status within transaction
+        const currentStatusId = currentStatusRes.rows.length > 0 ? currentStatusRes.rows[0].status : 'not found';
+        console.warn(`[LOG ACTION] Weapon ID ${gun_taken} (Action Type: ${parsedActionType}) status NOT updated. Current status ID: ${currentStatusId}.`);
+      }
+    }
+
+    if (specials_taken) {
+      specialUpdateAttempted = true;
+      let specialUpdateResult;
+      if (parsedActionType === ACTION_TAKEN_ID) {
+        specialUpdateResult = await client.query(
+          'UPDATE specials SET status = $1 WHERE id = $2 AND status = $3', // Must be 'In Stock'
+          [STATUS_TAKEN_ID, specials_taken, STATUS_IN_STOCK_ID]
+        );
+        if (specialUpdateResult.rowCount > 0) specialUpdateSucceeded = true;
+      } else if (parsedActionType === ACTION_RETURNED_ID) {
+        specialUpdateResult = await client.query(
+          'UPDATE specials SET status = $1 WHERE id = $2 AND status IN ($3, $4, $5)', // 'Taken', 'Issued', 'Under Repair'
+          [STATUS_IN_STOCK_ID, specials_taken, STATUS_TAKEN_ID, STATUS_ISSUED_ID, STATUS_UNDER_REPAIR_ID]
+        );
+        if (specialUpdateResult.rowCount > 0) specialUpdateSucceeded = true;
+      } else if (parsedActionType === ACTION_MAINTENANCE_ID) {
+        specialUpdateResult = await client.query(
+          'UPDATE specials SET status = $1 WHERE id = $2 AND status IN ($3, $4, $5)', // 'In Stock', 'Issued', 'Taken'
+          [STATUS_UNDER_REPAIR_ID, specials_taken, STATUS_IN_STOCK_ID, STATUS_ISSUED_ID, STATUS_TAKEN_ID]
+        );
+        if (specialUpdateResult.rowCount > 0) specialUpdateSucceeded = true;
+      }
+
+      if (specialUpdateSucceeded) {
+        console.log(`[LOG ACTION] Special ID ${specials_taken} status updated successfully for action type ${parsedActionType}.`);
+      } else if (parsedActionType === ACTION_TAKEN_ID || parsedActionType === ACTION_RETURNED_ID || parsedActionType === ACTION_MAINTENANCE_ID) {
+        const currentStatusRes = await client.query('SELECT status FROM specials WHERE id = $1', [specials_taken]); // Check status within transaction
+        const currentStatusId = currentStatusRes.rows.length > 0 ? currentStatusRes.rows[0].status : 'not found';
+        console.warn(`[LOG ACTION] Special ID ${specials_taken} (Action Type: ${parsedActionType}) status NOT updated. Current status ID: ${currentStatusId}.`);
+      }
+    }
+
+    const relevantActionForStatusChange = [ACTION_TAKEN_ID, ACTION_RETURNED_ID, ACTION_MAINTENANCE_ID].includes(parsedActionType);
+
+    if (relevantActionForStatusChange) {
+      if ((gunUpdateAttempted && !gunUpdateSucceeded) || (specialUpdateAttempted && !specialUpdateSucceeded)) {
+        await client.query('ROLLBACK');
+        console.error('[LOG ACTION] Transaction rolled back: Item status update failed as item was not in the expected state.');
+
+        let gunCurrentStatusInfo = '';
+        if (gunUpdateAttempted && !gunUpdateSucceeded) {
+            const csRes = await pool.query('SELECT ws.name FROM weapon w JOIN weapon_statuses ws ON w.status = ws.id WHERE w.id = $1', [gun_taken]);
+            gunCurrentStatusInfo = csRes.rows.length > 0 ? ` Оружие (ID ${gun_taken}) сейчас в статусе "${csRes.rows[0].name}".` : ` Оружие (ID ${gun_taken}) не найдено или статус неизвестен.`;
+        }
+        let specialCurrentStatusInfo = '';
+        if (specialUpdateAttempted && !specialUpdateSucceeded) {
+             const csRes = await pool.query('SELECT ws.name FROM specials s JOIN weapon_statuses ws ON s.status = ws.id WHERE s.id = $1', [specials_taken]);
+             specialCurrentStatusInfo = csRes.rows.length > 0 ? ` Спецустройство (ID ${specials_taken}) сейчас в статусе "${csRes.rows[0].name}".` : ` Спецустройство (ID ${specials_taken}) не найдено или статус неизвестен.`;
+        }
+
+        return res.status(409).json({ 
+            success: false,
+            message: `Действие не выполнено: Статус предмета не соответствует ожидаемому для этого действия.${gunCurrentStatusInfo}${specialCurrentStatusInfo} Убедитесь, что предмет находится в корректном состоянии.`
+        });
+      }
+    }
+
+    await client.query('COMMIT');
+
+    // Fetch the newly created log with details for the response (using the main pool, not client, as transaction is committed)
     const logWithDetails = await pool.query(`
-      SELECT 
+      SELECT
         l.id, l.action_time AS time,
         s.name || ' ' || s.surname || ' ' || COALESCE(s.lastname, '') AS user,
         a.name AS action, w.name AS weapon_name, sp.name AS special_name,
@@ -551,11 +670,12 @@ app.post('/api/logs', authenticateToken, verifyCsrfToken, async (req, res) => { 
     `, [newLogId]);
 
     const formattedLog = logWithDetails.rows[0];
-    res.status(201).json({ // 201 Created status
+    res.status(201).json({
       success: true,
+      message: 'Лог успешно создан, статус предмета обновлен (Log created, item status updated successfully)',
       log: {
         id: formattedLog.id,
-        time: formattedLog.time ? new Date(formattedLog.time).toLocaleString() : 'N/A',
+        time: formattedLog.time ? new Date(formattedLog.time).toLocaleString('ru-RU') : 'N/A',
         user: formattedLog.user,
         action: formattedLog.action,
         item: formattedLog.weapon_name || formattedLog.special_name || "Не указано",
@@ -563,16 +683,28 @@ app.post('/api/logs', authenticateToken, verifyCsrfToken, async (req, res) => { 
         status: formattedLog.status_name
       },
     });
+
   } catch (error) {
-    console.error('Ошибка при создании лога (Error creating log entry):', error);
-    if (error.constraint) { // More specific error for DB constraints
-        return res.status(400).json({ success: false, message: `Ошибка данных: ${error.detail || error.message} (Data error)` });
+    // Only rollback if client exists and transaction might have started
+    if (client) {
+        try {
+            await client.query('ROLLBACK');
+        } catch (rollbackError) {
+            console.error('Ошибка при отмене транзакции (Error during rollback):', rollbackError);
+        }
     }
-    res.status(500).json({ success: false, message: 'Ошибка сервера (Server error)' });
+    console.error('Ошибка при создании лога или обновлении статуса предмета (Error creating log entry or updating item status):', error);
+    if (error.constraint) { // Handle specific DB constraint errors
+        return res.status(400).json({ success: false, message: `Ошибка данных: ${error.detail || error.message} (Data error due to constraint: ${error.constraint})` });
+    }
+    res.status(500).json({ success: false, message: 'Ошибка сервера (Server error during log creation)' });
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 });
 
-// --- Other Utility Endpoints (Consider adding authenticateToken if they expose sensitive info) ---
 app.get('/api/soldiers', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(`
