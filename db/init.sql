@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS weapon(
     id SERIAL PRIMARY KEY,
     name VARCHAR(63) NOT NULL,
     type INT REFERENCES weapon_type (id) NOT NULL,
-    status INT REFERENCES weapon_statuses NOT NULL,
+    status INT REFERENCES weapon_statuses(id) NOT NULL,
     last_maintenance TIMESTAMP DEFAULT NOW(),
     description TEXT
 );
@@ -101,7 +101,8 @@ CREATE TABLE IF NOT EXISTS system_users(
     lastname VARCHAR(63),
     role INT REFERENCES roles (id),
     password VARCHAR(255),
-    current_token VARCHAR(255)
+    current_token VARCHAR(255),
+    token_created TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Таблица action_status (уже существует)
@@ -196,3 +197,20 @@ INSERT INTO system_users (name, surname, lastname, role, password) VALUES
 ('admin', 'admin', 'admin', 1, '$2b$10$7QJAhrZQJlVhFfIAe7we2.g1vXQmVUN5BxH68VOC5tLYjft.6BJLm'), 
 ('user', 'user', 'user', 2, '$2b$10$plYle8DJLntIIgUKzsjYseiOcmLgQhy1EpFxXV9NUIrWsFQaOGFyi'), 
 ('user1', 'user1', 'user1', 2, '$2b$10$5Em/T/Nrbd9S7fUBGHg0c.vkzm8x5VpF7q21DzEsZyvogLpWQC14W');
+
+
+CREATE OR REPLACE FUNCTION check_token_expiry()
+RETURNS TRIGGER AS $$
+BEGIN
+
+    IF NEW.current_token IS NOT NULL 
+        AND NEW.token_created < NOW() - INTERVAL '15 minutes' THEN
+        NEW.current_token := NULL; 
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER token_expiry_trigger
+BEFORE INSERT OR UPDATE ON system_users
+FOR EACH ROW EXECUTE FUNCTION check_token_expiry();
