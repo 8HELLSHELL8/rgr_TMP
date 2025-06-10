@@ -142,7 +142,7 @@ const WeaponsPage = () => {
       <div className="page-container">
         <header className="page-header">
           <h1>{"// ARMORY: WEAPONS LIST //"}</h1>
-          <button className="styled-button back-button" onClick={() => navigate(-1)}>
+          <button className="styled-button back-button" onClick={() => navigate('/home')}>
             <FiArrowLeftCircle className="button-icon" />
             Back
           </button>

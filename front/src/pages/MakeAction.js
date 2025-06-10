@@ -163,7 +163,7 @@ const MakeAction = () => {
     }
   };
 
-  const goBack = () => navigate(-1);
+  const goBack = () => navigate('/home');
 
   if (loading && !success) { // Show main loader only if not in success state
     return (

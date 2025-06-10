@@ -140,7 +140,7 @@ const SpecialsPage = () => {
             <FiCpu className="header-icon" />
             {"// SPECIAL EQUIPMENT //"}
           </h1>
-          <button className="styled-button back-button" onClick={() => navigate(-1)}>
+          <button className="styled-button back-button" onClick={() => navigate('/home')}>
             <FiArrowLeftCircle className="button-icon" />
             {"Back"}
           </button>

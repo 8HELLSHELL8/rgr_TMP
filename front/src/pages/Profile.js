@@ -180,7 +180,7 @@ const Profile = () => {
             </dl>
           </div>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/home')}
             className="styled-button back-button"
           >
             <FiArrowLeftCircle className="button-icon" />

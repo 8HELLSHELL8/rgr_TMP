@@ -193,7 +193,7 @@ const SaveLog = () => {
   };
 
   const goBack = () => {
-    navigate(-1);
+    navigate('/home');
   };
 
   if (loading) {

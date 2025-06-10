@@ -33,7 +33,7 @@ const port = process.env.PORT || 5000;
 
 const corsOptions = {
   origin: ['http://localhost:80', 'http://localhost:3000', 'http://localhost:5000', 'http://217.71.129.139:5785',
-    'http://217.71.129.139:5784','http://172.17.7.208:3000', 'http://172.17.7.208:5000', 'http://172.17.7.208'], 
+    'http://217.71.129.139:5784','http://172.17.7.106:3000', 'http://172.17.7.106:5000', 'http://172.17.7.106'], 
   credentials: true,
 };
 

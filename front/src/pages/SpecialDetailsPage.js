@@ -70,7 +70,6 @@ const SpecialDetailsPage = () => {
           setError(`Asset with ID ${id} not found.`);
         } else if (err.response.status === 401 || err.response.status === 403) {
           setError("Authorization error. Please log in again.");
-          // Optional: navigate("/login", { state: { message: "Session expired." } });
         } else {
           setError(`Failed to load data (Status: ${err.response.status}).`);
         }
